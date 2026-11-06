@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corbin Study Hub</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="menuBtn" class="icon-btn" aria-label="Show or hide subjects" aria-expanded="true">☰</button>
+  <div class="brand">Study Hub</div>
+  <div class="spacer"></div>
+  <div class="profile" id="profile">
+    <button id="profileBtn" class="profile-btn" aria-haspopup="true" aria-expanded="false"></button>
+    <ul id="profileMenu" class="profile-menu" hidden></ul>
+  </div>
+</header>
+
+<div class="layout">
+  <nav id="sidebar" class="sidebar" aria-label="Subjects"></nav>
+  <div id="scrim" class="scrim" hidden></div>
+  <main id="main" class="main" tabindex="-1"></main>
+</div>
+
+<script src="data/profiles.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
