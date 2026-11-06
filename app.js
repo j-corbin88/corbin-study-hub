@@ -120,6 +120,41 @@
     $("#printBtn").onclick = () => window.print();
   }
 
+  // ---------- print cards ----------
+  // Letter pages, 2 x 4 grid (3.5in x 2.5in cards). Word pages come first, then a matching meaning page
+  // for each. Back pages are mirrored left/right so the two sides line up when printed double-sided
+  // (flip on the long edge).
+  function printCards(x) {
+    const COLS = 2, PER = 8;
+    const words = x.words.slice();
+    const cell = (w, side) => !w ? `<div class="pcard empty"></div>` : side === "front"
+      ? `<div class="pcard"><div class="pw">${esc(w.word)}</div>${w.pos ? `<div class="pp">${esc(w.pos)}</div>` : ""}</div>`
+      : `<div class="pcard"><div class="pd">${esc(w.def)}</div>${w.sentence ? `<div class="pe">&ldquo;${esc(w.sentence)}&rdquo;</div>` : ""}</div>`;
+    let html = "";
+    for (let i = 0; i < words.length; i += PER) {
+      const chunk = words.slice(i, i + PER);
+      while (chunk.length < PER) chunk.push(null);
+      html += `<section class="psheet">${chunk.map(w => cell(w, "front")).join("")}</section>`;
+      const mirrored = [];
+      for (let r = 0; r < PER / COLS; r++) {
+        const row = chunk.slice(r * COLS, r * COLS + COLS).reverse();
+        mirrored.push(...row);
+      }
+      html += `<section class="psheet">${mirrored.map(w => cell(w, "back")).join("")}</section>`;
+    }
+    const sheet = document.createElement("div");
+    sheet.id = "printSheet";
+    sheet.innerHTML = html;
+    document.body.appendChild(sheet);
+    document.body.classList.add("printing-cards");
+    const cleanup = () => { document.body.classList.remove("printing-cards"); sheet.remove(); window.removeEventListener("afterprint", cleanup); };
+    window.addEventListener("afterprint", cleanup);
+    window.print();
+  }
+  const printRow = `<div class="row no-print" style="justify-content:center;margin-top:20px">
+      <button class="btn" id="printCards">🖨 Print cards</button>
+      <span class="sub" style="margin:0;font-size:13px">Print double-sided (flip on long edge), then cut apart.</span></div>`;
+
   // ---------- flashcards ----------
   let fc = null;
   function startCards(x, words) {
@@ -136,7 +171,8 @@
           ${fc.missed.length ? `<button class="btn primary" id="again">Study the ${fc.missed.length} I missed</button>` : ""}
           <button class="btn" id="restart">Start over</button>
           <button class="btn" data-goquiz>Take the quiz</button>
-        </div></div>`;
+        </div></div>${printRow}`;
+      $("#printCards").onclick = () => printCards(fc.set);
       const a = $("#again"); if (a) a.onclick = () => startCards(fc.set, fc.missed);
       $("#restart").onclick = () => startCards(fc.set);
       return;
@@ -155,7 +191,8 @@
         <button class="btn bad" id="miss">✗ Still learning</button>
         <button class="btn" id="flip">Flip</button>
         <button class="btn good" id="know">✓ I know it</button>
-      </div>`;
+      </div>${printRow}`;
+    $("#printCards").onclick = () => printCards(fc.set);
     const flip = () => { fc.flipped = !fc.flipped; $("#flash").classList.toggle("flipped", fc.flipped); };
     $("#flash").onclick = flip; $("#flip").onclick = flip;
     $("#know").onclick = () => { fc.known++; nextCard(); };
