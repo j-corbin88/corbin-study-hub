@@ -68,9 +68,21 @@
       <div class="crumbs">${esc(profile().name)}</div>
       <h1>${subject().icon} ${esc(subject().name)}</h1>
       <p class="sub">Pick a study set to practice.</p>
-      ${list.length ? `<div class="grid">${list.map(setCard).join("")}</div>` :
+      ${list.length ? unitGroups(list) :
         `<div class="card">Nothing here yet for ${esc(profile().name)}. New study sets will show up here.</div>`}
     `;
+  }
+
+  // group sets under their "unit" heading (e.g. a book); sets with no unit come last under "Other"
+  function unitGroups(list) {
+    const order = [];
+    const by = {};
+    list.forEach(x => { const u = x.unit || ""; if (!by[u]) { by[u] = []; order.push(u); } by[u].push(x); });
+    order.sort((a, b) => (a === "") - (b === ""));
+    const multi = order.length > 1 || order[0] !== "";
+    return order.map(u => `
+      ${multi ? `<h2 class="unit-head">${u ? "📘 " + esc(u) : "Other"}</h2>` : ""}
+      <div class="grid">${by[u].map(setCard).join("")}</div>`).join("");
   }
 
   function setCard(x) {
@@ -87,7 +99,7 @@
     if (!x) return viewHome();
     const tab = (id, label) => `<button class="tab" role="tab" data-mode="${id}" aria-selected="${state.mode === id}">${label}</button>`;
     $("#main").innerHTML = `
-      <div class="crumbs"><a href="#" data-home style="color:inherit">${esc(subject().name)}</a> / ${esc(profile().name)}</div>
+      <div class="crumbs"><a href="#" data-home style="color:inherit">${esc(subject().name)}</a> / ${esc(profile().name)}${x.unit ? " / " + esc(x.unit) : ""}</div>
       <h1>${esc(x.title)}</h1>
       ${x.sample ? `<div class="banner">These are <b>sample words</b> so you can try the tool. Send me the real list and I'll swap it in.</div>` : ""}
       <div class="tabs" role="tablist">${tab("cards", "Flashcards")}${tab("quiz", "Quiz")}${tab("list", "Word list")}</div>

@@ -111,3 +111,6 @@ table.words{width:100%;border-collapse:collapse;background:var(--panel);border:1
   body{background:#fff}
   .main{max-width:none;padding:0}
 }
+
+.unit-head{font-size:20px;margin:26px 0 12px}
+.unit-head:first-of-type{margin-top:0}
