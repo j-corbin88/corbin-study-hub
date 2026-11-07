@@ -19,8 +19,10 @@
     try {
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = "en-US"; u.rate = 0.8;
-      const v = speechSynthesis.getVoices().find(v => /^en[-_]US/i.test(v.lang));
+      u.lang = "en-US"; u.rate = 0.5;
+      const vs = speechSynthesis.getVoices();
+      // Samantha is the clearest voice on iPad/iPhone; fall back to any US English voice
+      const v = vs.find(v => /^samantha/i.test(v.name)) || vs.find(v => /^en[-_]US/i.test(v.lang));
       if (v) u.voice = v;
       speechSynthesis.speak(u);
     } catch (e) {}
