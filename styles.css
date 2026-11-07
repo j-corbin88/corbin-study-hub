@@ -140,3 +140,13 @@ table.guide td:nth-child(1){width:34px;font-weight:700}
 .ok{color:var(--good);font-weight:700}
 .no{color:var(--bad);font-weight:700}
 .sub-row td{font-size:13px;color:var(--muted);font-style:italic;background:#fafbfd}
+
+/* spelling */
+.sp-pic{font-size:96px;line-height:1.1;margin:4px 0}
+.blanks{font-size:30px;letter-spacing:4px;font-family:ui-monospace,Menlo,monospace;color:var(--muted,#667)}
+.sp-input{font-size:32px;text-align:center;width:min(100%,320px);padding:10px 12px;border:2px solid #cbd5e1;border-radius:12px}
+.sp-input:focus{outline:none;border-color:#0ca678}
+.sp-err{color:#c92a2a;min-height:20px;margin:6px 0}
+.sp-word{font-size:40px;font-weight:700;margin:6px 0}
+.hl{color:#e8590c;background:#fff3e0;border-radius:6px;padding:0 3px}
+.face .pic{font-size:72px;line-height:1.1;margin-bottom:6px}

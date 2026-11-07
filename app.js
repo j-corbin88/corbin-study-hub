@@ -12,6 +12,20 @@
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const LETTERS = "ABCDE";
 
+  // read words aloud with the device's built-in voice (slow and clear for young spellers)
+  const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
+  function speak(text) {
+    if (!canSpeak || !text) return;
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-US"; u.rate = 0.8;
+      const v = speechSynthesis.getVoices().find(v => /^en[-_]US/i.test(v.lang));
+      if (v) u.voice = v;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
   const S = STUDY;
   const state = {
     profile: store.get("sh:profile") || S.profiles[0].id,
@@ -20,9 +34,12 @@
     mode: null
   };
   if (!S.profiles.some(p => p.id === state.profile)) state.profile = S.profiles[0].id;
-  if (!S.subjects.some(s => s.id === state.subject)) state.subject = S.subjects[0].id;
 
   const profile = () => S.profiles.find(p => p.id === state.profile);
+  // each kid can have their own subject list (profile.subjects); no list means all subjects
+  const allowedSubjects = () => { const p = profile(); return p.subjects ? S.subjects.filter(s => p.subjects.includes(s.id)) : S.subjects; };
+  const fixSubject = () => { if (!allowedSubjects().some(s => s.id === state.subject)) state.subject = allowedSubjects()[0].id; };
+  fixSubject();
   const subject = () => S.subjects.find(s => s.id === state.subject);
   const sets = () => ((S.content[state.profile] || {})[state.subject]) || [];
   const curSet = () => sets().find(x => x.id === state.setId);
@@ -31,7 +48,8 @@
   // tabs shown for each kind of study set (the first one is the default)
   const TABS = {
     vocab: [["cards", "Flashcards"], ["quiz", "Quiz"], ["list", "Word list"]],
-    test: [["test", "Practice test"], ["cards", "Flashcards"], ["order", "Story order"], ["guide", "Study guide"]]
+    test: [["test", "Practice test"], ["cards", "Flashcards"], ["order", "Story order"], ["guide", "Study guide"]],
+    spelling: [["spell", "Spelling quiz"], ["cards", "Flashcards"], ["list", "Word list"]]
   };
   // flashcards (and printed cards) come from the words of a vocab set, or the key terms of a test set
   const cardWords = x => (x.type === "test" ? x.terms : x.words);
@@ -57,7 +75,7 @@
   }
 
   function renderSidebar() {
-    $("#sidebar").innerHTML = `<h2>Subjects</h2>` + S.subjects.map(s =>
+    $("#sidebar").innerHTML = `<h2>Subjects</h2>` + allowedSubjects().map(s =>
       `<button class="nav-item" data-id="${s.id}" ${s.id === state.subject ? 'aria-current="true"' : ""}><span>${s.icon}</span>${esc(s.name)}</button>`
     ).join("");
   }
@@ -98,7 +116,7 @@
     const best = store.get(bestKey(x.id));
     const isTest = x.type === "test";
     return `<button class="card set-card" data-set="${x.id}">
-      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? "Chapter review" : "Vocabulary"}</span></div>
+      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? "Chapter review" : x.type === "spelling" ? "Spelling" : "Vocabulary"}</span></div>
       <h3 style="margin-top:10px">${esc(x.title)}</h3>
       <div class="sub" style="margin:0">${isTest ? x.questions.length + " questions" : x.words.length + " words"}${best ? ` &middot; best ${esc(best)}` : ""}</div>
     </button>`;
@@ -120,6 +138,7 @@
       cards: () => startCards(x),
       quiz: () => startQuiz(x),
       list: () => viewList(x),
+      spell: () => startSpelling(x),
       test: () => viewTestHome(x),
       order: () => viewOrder(x),
       guide: () => viewGuide(x)
@@ -132,7 +151,7 @@
       <div class="row no-print" style="margin-bottom:14px"><button class="btn" id="printBtn">Print list</button>
       <span class="sub" style="margin:0">Handy for writing the index cards by hand.</span></div>
       <table class="words"><thead><tr><th>Word</th><th>Type</th><th>Meaning</th><th>Example</th></tr></thead><tbody>
-      ${x.words.map(w => `<tr><td>${esc(w.word)}</td><td>${esc(w.pos || "")}</td><td>${esc(w.def)}</td><td>${esc(w.sentence || "")}</td></tr>`).join("")}
+      ${x.words.map(w => `<tr><td>${esc(w.word)}</td><td>${esc((w.pic ? w.pic + " " : "") + (w.pos || ""))}</td><td>${esc(w.def)}</td><td>${esc(w.sentence || "")}</td></tr>`).join("")}
       </tbody></table>`;
     $("#printBtn").onclick = () => window.print();
   }
@@ -145,7 +164,7 @@
     const COLS = 2, PER = 8;
     const words = cardWords(x).slice();
     const cell = (w, side) => !w ? `<div class="pcard empty"></div>` : side === "front"
-      ? `<div class="pcard"><div class="pw">${esc(w.word)}</div>${w.pos ? `<div class="pp">${esc(w.pos)}</div>` : ""}</div>`
+      ? `<div class="pcard">${w.pic ? `<div style="font-size:44px;line-height:1.1">${w.pic}</div>` : ""}<div class="pw">${esc(w.word)}</div>${w.pos ? `<div class="pp">${esc(w.pos)}</div>` : ""}</div>`
       : `<div class="pcard"><div class="pd">${esc(w.def)}</div>${w.sentence ? `<div class="pe">&ldquo;${esc(w.sentence)}&rdquo;</div>` : ""}</div>`;
     let html = "";
     for (let i = 0; i < words.length; i += PER) {
@@ -182,7 +201,7 @@
   function drawCard() {
     const p = $("#panel");
     if (fc.i >= fc.deck.length) {
-      const hasQuiz = (fc.set.type === "test") ? "Take the practice test" : "Take the quiz";
+      const hasQuiz = fc.set.type === "test" ? "Take the practice test" : fc.set.type === "spelling" ? "Take the spelling quiz" : "Take the quiz";
       p.innerHTML = `<div class="card" style="text-align:center">
         <h2>Deck complete</h2>
         <p class="sub">You knew ${fc.known} of ${fc.total}.</p>
@@ -202,16 +221,18 @@
       <div class="progress"><i style="width:${(fc.i / fc.deck.length) * 100}%"></i></div>
       <div class="flash-wrap">
         <div class="flash ${fc.flipped ? "flipped" : ""}" id="flash" role="button" tabindex="0" aria-label="Flip card">
-          <div class="face"><div class="big ${w.word.length > 22 ? "long" : ""}">${esc(w.word)}</div>${w.pos ? `<div class="pos">${esc(w.pos)}</div>` : ""}<div class="hint">tap to flip &middot; space</div></div>
+          <div class="face">${w.pic ? `<div class="pic" aria-hidden="true">${w.pic}</div>` : ""}<div class="big ${w.word.length > 22 ? "long" : ""}">${esc(w.word)}</div>${w.pos ? `<div class="pos">${esc(w.pos)}</div>` : ""}<div class="hint">tap to flip &middot; space</div></div>
           <div class="face back"><div class="def">${esc(w.def)}</div>${w.sentence ? `<div class="ex">&ldquo;${esc(w.sentence)}&rdquo;</div>` : ""}</div>
         </div>
       </div>
       <div class="flash-controls">
         <button class="btn bad" id="miss">✗ Still learning</button>
         <button class="btn" id="flip">Flip</button>
+        ${canSpeak && fc.set.type === "spelling" ? `<button class="btn" id="hearCard">🔊 Hear it</button>` : ""}
         <button class="btn good" id="know">✓ I know it</button>
       </div>${printRow}`;
     $("#printCards").onclick = () => printCards(fc.set);
+    const hc = $("#hearCard"); if (hc) hc.onclick = () => speak(w.word);
     const flip = () => { fc.flipped = !fc.flipped; $("#flash").classList.toggle("flipped", fc.flipped); };
     $("#flash").onclick = flip; $("#flip").onclick = flip;
     $("#know").onclick = () => { fc.known++; nextCard(); };
@@ -312,6 +333,107 @@
     $("#tocards").onclick = () => { state.mode = "cards"; viewSet(); };
   }
 
+  // ---------- spelling: hear the word, see the picture, type it ----------
+  const normWord = s => String(s).trim().toLowerCase().replace(/[’‘]/g, "'");
+  // color the part of the word the lesson is about (a blend like "fl", or the apostrophe)
+  const hiWord = w => {
+    const i = w.hl ? w.word.toLowerCase().indexOf(w.hl.toLowerCase()) : -1;
+    if (i < 0) return esc(w.word);
+    return esc(w.word.slice(0, i)) + `<span class="hl">${esc(w.word.slice(i, i + w.hl.length))}</span>` + esc(w.word.slice(i + w.hl.length));
+  };
+  const blanksFor = word => [...word].map(c => (c === "'" || c === "’") ? "'" : "_").join(" ");
+  let sp = null;
+  function startSpelling(x, words) {
+    const base = words || x.words;
+    sp = { set: x, qs: shuffle(base), i: 0, score: 0, missed: [], full: !words };
+    drawSpell();
+  }
+  function drawSpell() {
+    if (sp.i >= sp.qs.length) return endSpell();
+    const w = sp.qs[sp.i];
+    $("#panel").innerHTML = `
+      <div class="sub" style="margin-bottom:0">Word ${sp.i + 1} of ${sp.qs.length} &middot; ${sp.score} right</div>
+      <div class="progress"><i style="width:${(sp.i / sp.qs.length) * 100}%"></i></div>
+      <div class="card" style="text-align:center">
+        ${w.pic ? `<div class="sp-pic" aria-hidden="true">${w.pic}</div>` : ""}
+        <div class="row" style="justify-content:center;margin:6px 0 14px">
+          ${canSpeak ? `<button class="btn primary" id="hear">🔊 Hear it</button><button class="btn" id="hearS">Hear it in a sentence</button>`
+                     : `<span class="sub" style="margin:0">No sound on this device. It means: ${esc(w.def)}</span>`}
+        </div>
+        <div class="blanks" aria-hidden="true">${blanksFor(w.word)}</div>
+        <div style="margin:14px 0 4px"><input id="spIn" class="sp-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word"></div>
+        <div id="spErr" class="sp-err"></div>
+        <div class="row" style="justify-content:center"><button class="btn primary" id="spCheck">Check</button></div>
+        <div id="spFb"></div>
+      </div>`;
+    const input = $("#spIn");
+    input.focus();
+    const hear = $("#hear"); if (hear) hear.onclick = () => speak(w.word);
+    const hearS = $("#hearS"); if (hearS) hearS.onclick = () => speak(w.sentence);
+    const check = () => {
+      if (!input.value.trim()) { $("#spErr").textContent = "Type the word first."; return; }
+      $("#spErr").textContent = "";
+      const typed = input.value;
+      input.disabled = true;
+      $("#spCheck").remove();
+      const ok = normWord(typed) === normWord(w.word);
+      if (ok) sp.score++; else sp.missed.push(w);
+      spellFeedback(w, ok, typed);
+    };
+    $("#spCheck").onclick = check;
+    input.onkeydown = e => { if (e.key === "Enter") check(); };
+    if (canSpeak) setTimeout(() => speak(w.word), 300);
+  }
+  function spellFeedback(w, ok, typed) {
+    const nextBtn = `<div style="margin-top:14px"><button class="btn primary" id="spNext">Next &rarr;</button></div>`;
+    const goNext = () => { sp.i++; drawSpell(); };
+    const fb = $("#spFb");
+    const note = w.note ? `<small>${esc(w.note)}</small>` : "";
+    if (ok) {
+      fb.innerHTML = `<div class="feedback good" style="margin-top:14px"><div class="sp-word">${hiWord(w)}</div>Nice spelling!${note}<small>${esc(w.sentence)}</small></div>${nextBtn}`;
+      $("#spNext").onclick = goNext; $("#spNext").focus();
+      return;
+    }
+    fb.innerHTML = `<div class="feedback bad" style="margin-top:14px">Not quite. You typed &ldquo;${esc(typed)}&rdquo;. Here is the word:
+        <div class="sp-word">${hiWord(w)}</div>${note}</div>
+      <p class="sub" style="margin:14px 0 6px">Type it one more time:</p>
+      <input id="spIn2" class="sp-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word again">
+      <div id="spErr2" class="sp-err"></div>
+      <div class="row" style="justify-content:center"><button class="btn primary" id="spAgain">Check</button><button class="btn" id="spSkip">Skip</button></div>`;
+    const in2 = $("#spIn2"); in2.focus();
+    const again = () => {
+      if (normWord(in2.value) === normWord(w.word)) {
+        fb.insertAdjacentHTML("beforeend", "");
+        $("#spErr2").textContent = "";
+        in2.disabled = true; $("#spAgain").remove(); $("#spSkip").remove();
+        fb.insertAdjacentHTML("beforeend", `<div class="feedback good" style="margin-top:12px">That's it!</div>${nextBtn}`);
+        $("#spNext").onclick = goNext; $("#spNext").focus();
+      } else $("#spErr2").textContent = "Look at the word and try again.";
+    };
+    $("#spAgain").onclick = again;
+    in2.onkeydown = e => { if (e.key === "Enter") again(); };
+    $("#spSkip").onclick = goNext;
+  }
+  function endSpell() {
+    const total = sp.qs.length, pct = Math.round((sp.score / total) * 100);
+    if (sp.full) {
+      const prev = parseInt((store.get(bestKey(sp.set.id)) || "0").split("/")[0], 10) || 0;
+      if (sp.score >= prev) store.set(bestKey(sp.set.id), `${sp.score}/${total}`);
+    }
+    $("#panel").innerHTML = `<div class="card" style="text-align:center">
+      <p class="score">${sp.score}/${total}</p>
+      <p class="sub">${pct === 100 ? "Perfect spelling!" : pct >= 80 ? "Great job!" : pct >= 60 ? "Good try - practice the ones you missed." : "Keep practicing - flashcards will help."}</p>
+      ${sp.missed.length ? `<div style="max-width:420px;margin:0 auto 18px;text-align:left"><b>Practice these:</b><ul class="missed">${sp.missed.map(w => `<li>${w.pic ? w.pic + " " : ""}<b>${hiWord(w)}</b></li>`).join("")}</ul></div>` : ""}
+      <div class="row" style="justify-content:center">
+        ${sp.missed.length ? `<button class="btn primary" id="spRetry">Practice the ${sp.missed.length} I missed</button>` : ""}
+        <button class="btn" id="spAll">Try again</button>
+        <button class="btn" id="spCards">Flashcards</button>
+      </div></div>`;
+    const r = $("#spRetry"); if (r) r.onclick = () => startSpelling(sp.set, sp.missed.slice());
+    $("#spAll").onclick = () => startSpelling(sp.set);
+    $("#spCards").onclick = () => { state.mode = "cards"; viewSet(); };
+  }
+
   // ---------- practice test (theology and other "test" sets) ----------
   const isMissed = q => q.cole != null && q.cole !== q.ans;
   function viewTestHome(x) {
@@ -401,6 +523,7 @@
     if (t.closest("#profileMenu") && t.dataset.id) {
       state.profile = t.dataset.id; store.set("sh:profile", state.profile);
       $("#profileMenu").hidden = true; renderProfile();
+      fixSubject(); renderSidebar();
       loadContent(state.profile).then(viewHome); return;
     }
     if (t.classList.contains("nav-item") && !t.disabled) {
@@ -412,7 +535,7 @@
     if (t.dataset.set) { state.setId = t.dataset.set; state.mode = null; return viewSet(); }
     if (t.dataset.mode) { state.mode = t.dataset.mode; return viewSet(); }
     if (t.hasAttribute("data-home")) { e.preventDefault(); return viewHome(); }
-    if (t.hasAttribute("data-goquiz")) { const x = curSet(); state.mode = x && x.type === "test" ? "test" : "quiz"; return viewSet(); }
+    if (t.hasAttribute("data-goquiz")) { const x = curSet(); state.mode = x && x.type === "test" ? "test" : x && x.type === "spelling" ? "spell" : "quiz"; return viewSet(); }
   });
   $("#scrim").addEventListener("click", () => setSide(false));
   document.addEventListener("keydown", e => {
