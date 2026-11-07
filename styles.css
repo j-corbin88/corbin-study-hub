@@ -130,3 +130,13 @@ table.words{width:100%;border-collapse:collapse;background:var(--panel);border:1
   .pd{font-size:17px;font-weight:600}
   .pe{font-style:italic;color:#444;margin-top:10px;font-size:13px}
 }
+
+/* test sets */
+.face .big.long{font-size:24px}
+.timeline{margin:0 0 18px;padding-left:22px}
+.timeline li{margin:8px 0}
+.feedback small.note{color:var(--muted);font-style:italic}
+table.guide td:nth-child(1){width:34px;font-weight:700}
+.ok{color:var(--good);font-weight:700}
+.no{color:var(--bad);font-weight:700}
+.sub-row td{font-size:13px;color:var(--muted);font-style:italic;background:#fafbfd}

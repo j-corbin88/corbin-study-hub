@@ -4,11 +4,12 @@ window.STUDY = window.STUDY || { content: {} };
 
 STUDY.profiles = [
   { id: "cole",  name: "Cole",  color: "#3b5bdb" },
-  { id: "kid2",  name: "Kid 2", color: "#e8590c" },  // rename me
-  { id: "kid3",  name: "Kid 3", color: "#0ca678" }   // rename me
+  { id: "grace",  name: "Grace",  color: "#e8590c" },
+  { id: "margaux", name: "Margaux", color: "#0ca678" }
 ];
 
 STUDY.subjects = [
-  { id: "english", name: "English", icon: "📖" }
+  { id: "english", name: "English", icon: "📖" },
+  { id: "theology", name: "Theology", icon: "✝️" }
   // Later: { id: "math", name: "Math", icon: "➗" }, science, history, etc.
 ];

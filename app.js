@@ -10,13 +10,14 @@
   };
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const LETTERS = "ABCDE";
 
   const S = STUDY;
   const state = {
     profile: store.get("sh:profile") || S.profiles[0].id,
     subject: store.get("sh:subject") || S.subjects[0].id,
     setId: null,
-    mode: "cards"
+    mode: null
   };
   if (!S.profiles.some(p => p.id === state.profile)) state.profile = S.profiles[0].id;
   if (!S.subjects.some(s => s.id === state.subject)) state.subject = S.subjects[0].id;
@@ -26,6 +27,14 @@
   const sets = () => ((S.content[state.profile] || {})[state.subject]) || [];
   const curSet = () => sets().find(x => x.id === state.setId);
   const bestKey = id => `sh:best:${state.profile}:${id}`;
+
+  // tabs shown for each kind of study set (the first one is the default)
+  const TABS = {
+    vocab: [["cards", "Flashcards"], ["quiz", "Quiz"], ["list", "Word list"]],
+    test: [["test", "Practice test"], ["cards", "Flashcards"], ["order", "Story order"], ["guide", "Study guide"]]
+  };
+  // flashcards (and printed cards) come from the words of a vocab set, or the key terms of a test set
+  const cardWords = x => (x.type === "test" ? x.terms : x.words);
 
   // load a kid's content file on demand (works from file:// and Netlify)
   function loadContent(id) {
@@ -87,29 +96,37 @@
 
   function setCard(x) {
     const best = store.get(bestKey(x.id));
+    const isTest = x.type === "test";
     return `<button class="card set-card" data-set="${x.id}">
-      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${x.type === "vocab" ? "Vocabulary" : esc(x.type)}</span></div>
+      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? "Chapter review" : "Vocabulary"}</span></div>
       <h3 style="margin-top:10px">${esc(x.title)}</h3>
-      <div class="sub" style="margin:0">${x.words.length} words${best ? ` &middot; best quiz ${esc(best)}` : ""}</div>
+      <div class="sub" style="margin:0">${isTest ? x.questions.length + " questions" : x.words.length + " words"}${best ? ` &middot; best ${esc(best)}` : ""}</div>
     </button>`;
   }
 
   function viewSet() {
     const x = curSet();
     if (!x) return viewHome();
-    const tab = (id, label) => `<button class="tab" role="tab" data-mode="${id}" aria-selected="${state.mode === id}">${label}</button>`;
+    const tabs = TABS[x.type] || TABS.vocab;
+    if (!tabs.some(t => t[0] === state.mode)) state.mode = tabs[0][0];
+    const tab = ([id, label]) => `<button class="tab" role="tab" data-mode="${id}" aria-selected="${state.mode === id}">${label}</button>`;
     $("#main").innerHTML = `
       <div class="crumbs"><a href="#" data-home style="color:inherit">${esc(subject().name)}</a> / ${esc(profile().name)}${x.unit ? " / " + esc(x.unit) : ""}</div>
       <h1>${esc(x.title)}</h1>
       ${x.sample ? `<div class="banner">These are <b>sample words</b> so you can try the tool. Send me the real list and I'll swap it in.</div>` : ""}
-      <div class="tabs" role="tablist">${tab("cards", "Flashcards")}${tab("quiz", "Quiz")}${tab("list", "Word list")}</div>
+      <div class="tabs" role="tablist">${tabs.map(tab).join("")}</div>
       <div id="panel"></div>`;
-    if (state.mode === "cards") startCards(x);
-    else if (state.mode === "quiz") startQuiz(x);
-    else viewList(x);
+    ({
+      cards: () => startCards(x),
+      quiz: () => startQuiz(x),
+      list: () => viewList(x),
+      test: () => viewTestHome(x),
+      order: () => viewOrder(x),
+      guide: () => viewGuide(x)
+    })[state.mode]();
   }
 
-  // ---------- word list ----------
+  // ---------- word list (vocab) ----------
   function viewList(x) {
     $("#panel").innerHTML = `
       <div class="row no-print" style="margin-bottom:14px"><button class="btn" id="printBtn">Print list</button>
@@ -126,7 +143,7 @@
   // (flip on the long edge).
   function printCards(x) {
     const COLS = 2, PER = 8;
-    const words = x.words.slice();
+    const words = cardWords(x).slice();
     const cell = (w, side) => !w ? `<div class="pcard empty"></div>` : side === "front"
       ? `<div class="pcard"><div class="pw">${esc(w.word)}</div>${w.pos ? `<div class="pp">${esc(w.pos)}</div>` : ""}</div>`
       : `<div class="pcard"><div class="pd">${esc(w.def)}</div>${w.sentence ? `<div class="pe">&ldquo;${esc(w.sentence)}&rdquo;</div>` : ""}</div>`;
@@ -158,19 +175,21 @@
   // ---------- flashcards ----------
   let fc = null;
   function startCards(x, words) {
-    fc = { deck: shuffle(words || x.words), i: 0, flipped: false, missed: [], known: 0, total: (words || x.words).length, set: x };
+    const base = words || cardWords(x);
+    fc = { deck: shuffle(base), i: 0, flipped: false, missed: [], known: 0, total: base.length, set: x };
     drawCard();
   }
   function drawCard() {
     const p = $("#panel");
     if (fc.i >= fc.deck.length) {
+      const hasQuiz = (fc.set.type === "test") ? "Take the practice test" : "Take the quiz";
       p.innerHTML = `<div class="card" style="text-align:center">
         <h2>Deck complete</h2>
         <p class="sub">You knew ${fc.known} of ${fc.total}.</p>
         <div class="row" style="justify-content:center">
           ${fc.missed.length ? `<button class="btn primary" id="again">Study the ${fc.missed.length} I missed</button>` : ""}
           <button class="btn" id="restart">Start over</button>
-          <button class="btn" data-goquiz>Take the quiz</button>
+          <button class="btn" data-goquiz>${hasQuiz}</button>
         </div></div>${printRow}`;
       $("#printCards").onclick = () => printCards(fc.set);
       const a = $("#again"); if (a) a.onclick = () => startCards(fc.set, fc.missed);
@@ -183,7 +202,7 @@
       <div class="progress"><i style="width:${(fc.i / fc.deck.length) * 100}%"></i></div>
       <div class="flash-wrap">
         <div class="flash ${fc.flipped ? "flipped" : ""}" id="flash" role="button" tabindex="0" aria-label="Flip card">
-          <div class="face"><div class="big">${esc(w.word)}</div>${w.pos ? `<div class="pos">${esc(w.pos)}</div>` : ""}<div class="hint">tap to flip &middot; space</div></div>
+          <div class="face"><div class="big ${w.word.length > 22 ? "long" : ""}">${esc(w.word)}</div>${w.pos ? `<div class="pos">${esc(w.pos)}</div>` : ""}<div class="hint">tap to flip &middot; space</div></div>
           <div class="face back"><div class="def">${esc(w.def)}</div>${w.sentence ? `<div class="ex">&ldquo;${esc(w.sentence)}&rdquo;</div>` : ""}</div>
         </div>
       </div>
@@ -200,10 +219,10 @@
   }
   function nextCard() { fc.i++; fc.flipped = false; drawCard(); }
 
-  // ---------- quiz ----------
+  // ---------- quiz engine (shared by vocab quiz, practice test, and story order) ----------
   let qz = null;
   function buildQuestions(words) {
-    const qs = shuffle(words).map(w => {
+    return shuffle(words).map(w => {
       const kinds = ["word-to-def", "def-to-word"];
       if (w.sentence && new RegExp(w.word, "i").test(w.sentence)) kinds.push("blank");
       const kind = kinds[Math.floor(Math.random() * kinds.length)];
@@ -222,12 +241,16 @@
       }
       return { w, kind, label, prompt, correct, opts: shuffle(opts) };
     });
-    return qs;
   }
   function startQuiz(x, words) {
     const w = words || x.words;
     if (w.length < 2) { $("#panel").innerHTML = `<div class="card">Need at least 2 words for a quiz.</div>`; return; }
-    qz = { set: x, qs: buildQuestions(w), i: 0, score: 0, missed: [], answered: false };
+    qz = { set: x, qs: buildQuestions(w), i: 0, score: 0, missed: [], missedQs: [], answered: false, record: true, regen: null };
+    drawQ();
+  }
+  // run an already-built list of questions (used by the practice test and story order)
+  function runQs(x, qs, opts) {
+    qz = { set: x, qs, i: 0, score: 0, missed: [], missedQs: [], answered: false, record: !!opts.record, regen: opts.regen };
     drawQ();
   }
   function drawQ() {
@@ -239,9 +262,9 @@
       <div class="sub" style="margin-bottom:0">Question ${qz.i + 1} of ${qz.qs.length} &middot; ${qz.score} correct</div>
       <div class="progress"><i style="width:${(qz.i / qz.qs.length) * 100}%"></i></div>
       <div class="card">
-        <div class="q-kind">${q.label}</div>
+        <div class="q-kind">${esc(q.label)}</div>
         <div class="q-prompt">${esc(q.prompt)}</div>
-        <div class="opts">${q.opts.map((o, n) => `<button class="opt" data-n="${n}"><span class="k">${"ABCD"[n]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+        <div class="opts">${q.opts.map((o, n) => `<button class="opt" data-n="${n}"><span class="k">${LETTERS[n]}</span><span>${esc(o)}</span></button>`).join("")}</div>
         <div id="fb"></div>
       </div>`;
     p.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.n));
@@ -256,30 +279,115 @@
       if (q.opts[i] === q.correct) b.classList.add("correct");
       else if (i === n) b.classList.add("wrong");
     });
-    if (ok) qz.score++; else qz.missed.push(q.w);
+    if (ok) qz.score++; else { qz.missed.push(q.w); qz.missedQs.push(q); }
     const last = qz.i === qz.qs.length - 1;
     $("#fb").innerHTML = `<div class="feedback ${ok ? "good" : "bad"}">${ok ? "Correct!" : "Not quite."}
-      <small><b>${esc(q.w.word)}</b>: ${esc(q.w.def)}</small></div>
+      <small><b>${esc(q.w.word)}</b>: ${esc(q.w.def)}</small>${q.note ? `<small class="note">${esc(q.note)}</small>` : ""}</div>
       <div style="margin-top:14px"><button class="btn primary" id="next">${last ? "See results" : "Next"} &rarr;</button></div>`;
     $("#next").onclick = () => { qz.i++; drawQ(); };
     $("#next").focus();
   }
   function endQuiz() {
     const total = qz.qs.length, pct = Math.round((qz.score / total) * 100);
-    const prev = parseInt((store.get(bestKey(qz.set.id)) || "0").split("/")[0], 10) || 0;
-    if (qz.score >= prev) store.set(bestKey(qz.set.id), `${qz.score}/${total}`);
+    if (qz.record) {
+      const prev = parseInt((store.get(bestKey(qz.set.id)) || "0").split("/")[0], 10) || 0;
+      if (qz.score >= prev) store.set(bestKey(qz.set.id), `${qz.score}/${total}`);
+    }
     $("#panel").innerHTML = `<div class="card" style="text-align:center">
       <p class="score">${qz.score}/${total}</p>
       <p class="sub">${pct}% &middot; ${pct === 100 ? "Perfect!" : pct >= 80 ? "Great work!" : pct >= 60 ? "Getting there - review the ones you missed." : "Keep practicing - flashcards will help."}</p>
-      ${qz.missed.length ? `<div style="text-align:left;max-width:520px;margin:0 auto 18px"><b>Review these:</b><ul class="missed">${qz.missed.map(w => `<li><b>${esc(w.word)}</b> - ${esc(w.def)}</li>`).join("")}</ul></div>` : ""}
+      ${qz.missed.length ? `<div style="text-align:left;max-width:560px;margin:0 auto 18px"><b>Review these:</b><ul class="missed">${qz.missed.map(w => `<li><b>${esc(w.word)}</b> - ${esc(w.def)}</li>`).join("")}</ul></div>` : ""}
       <div class="row" style="justify-content:center">
         ${qz.missed.length ? `<button class="btn primary" id="retry">Quiz me on the ${qz.missed.length} I missed</button>` : ""}
-        <button class="btn" id="newq">New quiz</button>
+        <button class="btn" id="newq">${qz.regen ? "Try again" : "New quiz"}</button>
         <button class="btn" id="tocards">Flashcards</button>
       </div></div>`;
-    const r = $("#retry"); if (r) r.onclick = () => startQuiz(qz.set, qz.missed.length >= 2 ? qz.missed.concat(shuffle(qz.set.words.filter(w => !qz.missed.includes(w))).slice(0, 1)) : qz.set.words);
-    $("#newq").onclick = () => startQuiz(qz.set);
+    const r = $("#retry");
+    if (r) r.onclick = () => {
+      if (qz.regen) return runQs(qz.set, qz.missedQs.slice(), { regen: qz.regen });
+      const words = qz.missed.length >= 2 ? qz.missed.concat(shuffle(qz.set.words.filter(w => !qz.missed.includes(w))).slice(0, 1)) : qz.set.words;
+      startQuiz(qz.set, words);
+    };
+    $("#newq").onclick = () => qz.regen ? qz.regen() : startQuiz(qz.set);
     $("#tocards").onclick = () => { state.mode = "cards"; viewSet(); };
+  }
+
+  // ---------- practice test (theology and other "test" sets) ----------
+  const isMissed = q => q.cole != null && q.cole !== q.ans;
+  function viewTestHome(x) {
+    const missed = x.questions.filter(isMissed);
+    const chapters = [...new Set(x.questions.map(q => q.ch))].sort((a, b) => a - b);
+    const best = store.get(bestKey(x.id));
+    $("#panel").innerHTML = `
+      <div class="card">
+        <h2>${x.questions.length} questions</h2>
+        <p class="sub">Same questions and answer letters as the study guide.${best ? ` Best score so far: ${esc(best)}.` : ""}</p>
+        <div class="row">
+          <button class="btn primary" data-t="all">Start in order</button>
+          <button class="btn" data-t="shuffle">Shuffle the questions</button>
+          ${missed.length ? `<button class="btn" data-t="missed">Review the ${missed.length} I missed</button>` : ""}
+        </div>
+        <p class="sub" style="margin:18px 0 8px">Or practice one chapter at a time:</p>
+        <div class="row">${chapters.map(c => `<button class="btn" data-t="ch${c}">Chapter ${c} (${x.questions.filter(q => q.ch === c).length})</button>`).join("")}</div>
+      </div>`;
+    $("#panel").querySelectorAll("[data-t]").forEach(b => b.onclick = () => startTest(x, b.dataset.t));
+  }
+  function startTest(x, which) {
+    let qs = x.questions;
+    if (which === "shuffle") qs = shuffle(qs);
+    else if (which === "missed") qs = qs.filter(isMissed);
+    else if (which.startsWith("ch")) qs = qs.filter(q => "ch" + q.ch === which);
+    const built = qs.map(q => ({
+      w: { word: "Question " + q.n, def: q.why }, kind: "test",
+      label: `Chapter ${q.ch} · Question ${q.n}`, prompt: q.q,
+      correct: q.opts[q.ans], opts: q.opts.slice(), note: q.note || ""
+    }));
+    runQs(x, built, { record: which === "all" || which === "shuffle", regen: () => startTest(x, which) });
+  }
+
+  // ---------- story order ----------
+  function viewOrder(x) {
+    $("#panel").innerHTML = `
+      <div class="card">
+        <h2>The story in order</h2>
+        <ol class="timeline">${x.events.map(e => `<li>${esc(e)}</li>`).join("")}</ol>
+        <div class="row no-print"><button class="btn primary" id="ordq">Quiz me on the order</button></div>
+      </div>`;
+    $("#ordq").onclick = () => startOrder(x);
+  }
+  function startOrder(x) {
+    const E = x.events, qs = [];
+    for (let i = 0; i < E.length - 1; i++) {
+      const others = shuffle(E.filter((_, j) => j !== i && j !== i + 1)).slice(0, 3);
+      qs.push({
+        w: { word: "Story order", def: `${E[i]}, and then: ${E[i + 1]}` }, kind: "order",
+        label: "What happened next?", prompt: E[i], correct: E[i + 1], opts: shuffle([E[i + 1], ...others]), note: ""
+      });
+    }
+    runQs(x, shuffle(qs), { regen: () => startOrder(x) });
+  }
+
+  // ---------- study guide (answers + how he did) ----------
+  function viewGuide(x) {
+    const hasCole = x.questions.some(q => q.cole != null);
+    const right = x.questions.filter(q => q.cole === q.ans).length;
+    const row = q => {
+      const ok = q.cole === q.ans;
+      const extra = q.written != null ? `<tr class="sub-row"><td></td><td colspan="4">Cole wrote: &ldquo;${esc(q.written)}&rdquo; &middot; ${esc(q.better)}</td></tr>` : "";
+      return `<tr><td>${q.n}</td><td>${esc(q.q)}</td>
+        <td><b>${LETTERS[q.ans]}.</b> ${esc(q.opts[q.ans])}</td>
+        <td>${q.cole == null ? "" : `<b>${LETTERS[q.cole]}.</b> ${esc(q.opts[q.cole])}`}</td>
+        <td class="${ok ? "ok" : "no"}">${q.cole == null ? "" : ok ? "✓" : "✗"}</td></tr>${extra}`;
+    };
+    const e = x.extra;
+    $("#panel").innerHTML = `
+      <div class="row no-print" style="margin-bottom:14px"><button class="btn" id="printBtn">Print guide</button>
+      ${hasCole ? `<span class="sub" style="margin:0">Cole's circled answers: ${right} of ${x.questions.length} match.</span>` : ""}</div>
+      <table class="words guide"><thead><tr><th>#</th><th>Question</th><th>Correct answer</th><th>Cole circled</th><th></th></tr></thead><tbody>
+      ${x.questions.map(row).join("")}
+      ${e ? `<tr><td>EC</td><td>${esc(e.q)}</td><td colspan="3">${esc(e.better)}<br><span class="sub" style="margin:0;font-size:13px">Cole wrote: &ldquo;${esc(e.cole)}&rdquo;</span></td></tr>` : ""}
+      </tbody></table>`;
+    $("#printBtn").onclick = () => window.print();
   }
 
   // ---------- events ----------
@@ -301,10 +409,10 @@
       if (window.innerWidth <= 800) setSide(false);
       return;
     }
-    if (t.dataset.set) { state.setId = t.dataset.set; state.mode = "cards"; return viewSet(); }
+    if (t.dataset.set) { state.setId = t.dataset.set; state.mode = null; return viewSet(); }
     if (t.dataset.mode) { state.mode = t.dataset.mode; return viewSet(); }
     if (t.hasAttribute("data-home")) { e.preventDefault(); return viewHome(); }
-    if (t.hasAttribute("data-goquiz")) { state.mode = "quiz"; return viewSet(); }
+    if (t.hasAttribute("data-goquiz")) { const x = curSet(); state.mode = x && x.type === "test" ? "test" : "quiz"; return viewSet(); }
   });
   $("#scrim").addEventListener("click", () => setSide(false));
   document.addEventListener("keydown", e => {
@@ -315,9 +423,11 @@
       if (e.key === "ArrowRight") $("#know").click();
       if (e.key === "ArrowLeft") $("#miss").click();
     }
-    if (state.mode === "quiz" && qz && qz.i < qz.qs.length && !qz.answered) {
-      const n = "abcd1234".indexOf(e.key.toLowerCase()) % 4;
-      if (n >= 0 && n < qz.qs[qz.i].opts.length && "abcd1234".includes(e.key.toLowerCase())) answer(n);
+    if (qz && qz.i < qz.qs.length && !qz.answered && $("#panel .opt:not(:disabled)")) {
+      const k = e.key.toLowerCase();
+      let n = "abcde".indexOf(k);
+      if (n < 0) n = "12345".indexOf(k);
+      if (n >= 0 && n < qz.qs[qz.i].opts.length) answer(n);
     }
   });
 

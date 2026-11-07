@@ -31,5 +31,108 @@ STUDY.content.cole = {
         { word: "wreaking", pos: "verb", def: "causing (damage or harm) on a large scale", sentence: "The storm was wreaking havoc on the coast." }
       ]
     }
+  ],
+
+  // A "test" set holds the study guide's questions exactly as written (same order and answer letters).
+  // ans = index of the correct choice, cole = index of what he circled (null if not answered).
+  // note = shown after answering when an answer follows the book and couldn't be confirmed elsewhere.
+  theology: [
+    {
+      id: "ignatius-ch-4-6-7",
+      unit: "St. Ignatius",
+      title: "St. Ignatius and the Company of Jesus - Chapters 4, 6, 7 review",
+      type: "test",
+      questions: [
+        { n: 1, ch: 4, q: "Ignatius was planning to go to ____ to take a ship to Italy before heading to Jerusalem.", opts: ["Pamplona", "Barcelona", "Germany", "Disney World"], ans: 1, cole: 1,
+          why: "Barcelona was the port city where he planned to catch a ship to Italy on his way to the Holy Land." },
+        { n: 2, ch: 4, q: "A terrible plague kept Ignatius from going to Barcelona, so he remained in ____ for many more months.", opts: ["Montserrat", "Italy", "Manresa", "Jaffa"], ans: 2, cole: 3,
+          why: "Manresa is where he stayed, praying in a cave. Jaffa is the port in the Holy Land where pilgrims landed, so he hadn't gotten there yet." },
+        { n: 3, ch: 4, q: "While Ignatius was praying in solitude in a cave, he came up with a plan to help people grow closer to God called...", opts: ["The Bible", "A Journal", "The Spiritual Exercises", "The Lord's Prayer"], ans: 2, cole: 2,
+          why: "The Spiritual Exercises are a plan of prayer to help people grow closer to God." },
+        { n: 4, ch: 4, q: "The Spiritual Exercises would be practiced on a ____, or a time set apart to be alone with God.", opts: ["camping trip", "retreat", "pilgrimage", "flute"], ans: 1, cole: 1,
+          why: "A retreat is a time set apart to be alone with God. A pilgrimage is a journey to a holy place." },
+        { n: 5, ch: 4, q: "The Spiritual Exercises would be practiced on retreat for ____ weeks.", opts: ["2 weeks", "3 weeks", "4 weeks", "6 weeks"], ans: 2, cole: 2,
+          why: "The Exercises are divided into four 'weeks' (about 30 days).",
+          note: "On the paper this was a fill-in-the-blank (Cole wrote 4). The other choices are added here for practice." },
+        { n: 6, ch: 4, q: "The spiritual retreat would include the following:", opts: ["Repentance (a turning away from sins)", "Contemplation of Christ's death", "Contemplation of Christ's life", "Contemplation of Christ's resurrection", "All of the above"], ans: 4, cole: 4,
+          why: "The four weeks cover sin and repentance, Christ's life, His death, and His resurrection, so it's all of them." },
+        { n: 7, ch: 4, q: "What message did Ignatius receive in a vision from God in Manresa?", opts: ["To go back to being a soldier for Spain", "To repent", "To go to school", "To form a company of men to draw all people to God"], ans: 3, cole: 3,
+          why: "The message was to form a company of men to draw all people to God. That became the Company of Jesus (the Jesuits).",
+          note: "This follows the book's wording. Worth a quick check against Chapter 4 in the book." },
+        { n: 8, ch: 4, q: "Ignatius went to Italy to see the Pope who gave him permission to go to Jerusalem on pilgrimage.", opts: ["True", "False"], ans: 0, cole: 1,
+          why: "True. In Rome the Pope (Adrian VI) gave him permission for the pilgrimage. The trouble with the Turks and the Franciscans came later, in Jerusalem (see Question 12).",
+          written: "because he wasn't able because the Turks would silence him",
+          better: "He did get permission. The problems came after he reached Jerusalem." },
+        { n: 9, ch: 4, q: "Another name for Jerusalem is:", opts: ["The Holy Land", "Barcelona", "Jesusville", "Jaffa"], ans: 0, cole: 0,
+          why: "Jerusalem and the land around it, where Jesus lived, is called the Holy Land. Jaffa is a port city and Barcelona is in Spain." },
+
+        { n: 10, ch: 6, q: "What did Ignatius hope to do in Jerusalem?", opts: ["Form his company of Jesus", "Get some souvenirs", "Meet Jesus", "Go to school"], ans: 0, cole: 0,
+          why: "He hoped to stay in the Holy Land and form his company of men to share Christ there. That's why Question 12 is false.",
+          note: "This follows the book's wording. Worth a quick check against Chapter 6." },
+        { n: 11, ch: 6, q: "Who would be opposed to Ignatius preaching about Christ in Jerusalem?", opts: ["The Pope", "The Dominicans", "The Turks (Muslims)", "God"], ans: 2, cole: 2,
+          why: "The Turks ruled the Holy Land then, and they would not welcome preaching about Christ." },
+        { n: 12, ch: 6, q: "Ignatius remained in Jerusalem, formed his company of Jesus and spread Christianity there.", opts: ["True", "False"], ans: 1, cole: 1,
+          why: "False. The Franciscan leader in Jerusalem ordered him to leave because it was too dangerous, so he sailed back to Spain.",
+          written: "because they wouldn't let him",
+          better: "Good. You can add who: the Franciscan leader told him to go." },
+        { n: 13, ch: 6, q: "Why did Ignatius go back to Barcelona?", opts: ["To form his company of men", "He liked to sail on a ship", "To go to school", "He missed home"], ans: 2, cole: 0,
+          why: "He was about 33 and didn't know Latin. He needed an education to help souls, so he went back to school in Barcelona." },
+
+        { n: 14, ch: 7, q: "Where is Barcelona?", opts: ["Jerusalem", "Italy", "Africa", "Spain"], ans: 3, cole: 3,
+          why: "Barcelona is a port city in Spain." },
+        { n: 15, ch: 7, q: "When Ignatius went back to school he started at the university level.", opts: ["True", "False"], ans: 1, cole: 1,
+          why: "False. He didn't know Latin yet, so he started with Latin grammar alongside young boys (Question 16).",
+          written: "because he wanted to learn unlike he did as kid",
+          better: "He started with Latin grammar with young boys, not at the university." },
+        { n: 16, ch: 7, q: "How did the young boys treat Ignatius in school?", opts: ["They accepted him", "They helped him", "They teased him", "They picked him for their kickball team"], ans: 2, cole: 2,
+          why: "They teased him. He was a grown man sitting in class with little boys." },
+        { n: 17, ch: 7, q: "Ignatius was \"slower to learn\" than the other students because...", opts: ["He wasn't smart", "He spent time caring for others", "He couldn't afford books", "He didn't understand the language"], ans: 1, cole: 1,
+          why: "He spent time caring for others instead of only studying.",
+          note: "This follows the book's wording. Worth a quick check against Chapter 7." },
+        { n: 18, ch: 7, q: "Who attacked Ignatius?", opts: ["Two Frenchmen", "Pokemon", "Two Jesuits", "Two Moors"], ans: 3, cole: 3,
+          why: "Two Moors attacked him.",
+          note: "This follows the book's wording. Worth a quick check against Chapter 7." },
+        { n: 19, ch: 7, q: "Why was Ignatius attacked?", opts: ["He had a lot of money", "Some people did not like what he was preaching", "He was being rude", "He got in the middle of a fight"], ans: 1, cole: 1,
+          why: "Some people did not like what he was preaching.",
+          note: "This follows the book's wording. Worth a quick check against Chapter 7." },
+        { n: 20, ch: 7, q: "Ignatius and his companions went to Alcala to:", opts: ["Go to the university", "Go on retreat", "Go on vacation", "Find work"], ans: 0, cole: 0,
+          why: "Alcala had a university, and they went there to study." },
+        { n: 21, ch: 7, q: "Ignatius and his companions were able to start at the university right away.", opts: ["True", "False"], ans: 1, cole: 1,
+          why: "False. The guide also asks what they did instead. Check Chapter 7 for that.",
+          written: "(left blank)",
+          better: "Look this one up in Chapter 7. The follow-up asks what they did instead." },
+        { n: 22, ch: 7, q: "What happened to Ignatius because the authorities did not like what he was preaching?", opts: ["He was starved", "He was arrested", "He had to go to Italy", "He got a D in Theology"], ans: 1, cole: 1,
+          why: "He was arrested." }
+      ],
+      extra: { q: "Extra credit: Who are the Moors?", cole: "people who are paid to attack people",
+               better: "Muslim people from North Africa who lived in and ruled parts of Spain for hundreds of years." },
+      events: [
+        "Stays in Manresa, praying in a cave and coming up with the Spiritual Exercises",
+        "Goes to Barcelona and sails for Italy",
+        "Meets the Pope in Rome and gets permission to go to Jerusalem",
+        "Travels to Jerusalem on pilgrimage",
+        "Is told to leave Jerusalem because it is too dangerous",
+        "Returns to Barcelona and goes back to school with young boys",
+        "Goes to the university at Alcala with his companions",
+        "Is arrested because the authorities don't like his preaching"
+      ],
+      terms: [
+        { word: "Manresa", pos: "town in Spain", def: "The town where Ignatius stayed for months, praying in a cave. The Spiritual Exercises began here." },
+        { word: "Spiritual Exercises", pos: "noun", def: "Ignatius's plan to help people grow closer to God through prayer, practiced on a retreat of about four weeks." },
+        { word: "Retreat", pos: "noun", def: "A time set apart to be alone with God." },
+        { word: "Pilgrimage", pos: "noun", def: "A journey to a holy place. Ignatius's pilgrimage was to Jerusalem." },
+        { word: "Repentance", pos: "noun", def: "Turning away from sins." },
+        { word: "Contemplation", pos: "noun", def: "Praying quietly while thinking deeply about something, like Christ's life, death, or resurrection." },
+        { word: "Barcelona", pos: "city in Spain", def: "A port city. Ignatius planned to sail from here to Italy, and later came back to go to school." },
+        { word: "Pope Adrian VI", pos: "person", def: "The Pope in Rome who gave Ignatius permission to make his pilgrimage to Jerusalem." },
+        { word: "Jerusalem", pos: "city", def: "The holy city where Jesus lived. Ignatius hoped to stay and form his company here." },
+        { word: "The Holy Land", pos: "place", def: "Another name for Jerusalem and the land where Jesus lived." },
+        { word: "Jaffa", pos: "port city", def: "The port where pilgrims landed on their way to Jerusalem." },
+        { word: "The Turks", pos: "people", def: "The Muslim rulers of the Holy Land at that time. They would oppose preaching about Christ in Jerusalem." },
+        { word: "The Moors", pos: "people", def: "Muslim people from North Africa who lived in and ruled parts of Spain for hundreds of years." },
+        { word: "Alcala", pos: "university town", def: "A university town in Spain. Ignatius and his companions went there to study." },
+        { word: "Company of Jesus", pos: "group", def: "The group of men Ignatius wanted to form to draw all people to God. Today they are called the Jesuits." }
+      ]
+    }
   ]
 };
