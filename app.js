@@ -33,7 +33,8 @@
     profile: store.get("sh:profile") || S.profiles[0].id,
     subject: store.get("sh:subject") || S.subjects[0].id,
     setId: null,
-    mode: null
+    mode: null,
+    parent: false
   };
   if (!S.profiles.some(p => p.id === state.profile)) state.profile = S.profiles[0].id;
 
@@ -70,13 +71,20 @@
   // ---------- chrome: profile menu + sidebar ----------
   function renderProfile() {
     const p = profile();
-    $("#profileBtn").innerHTML = `<span class="avatar" style="background:${p.color}">${esc(p.name[0])}</span><span>${esc(p.name)}</span> <span aria-hidden="true">▾</span>`;
+    $("#profileBtn").innerHTML = state.parent
+      ? `<span class="avatar" style="background:#495057">P</span><span>Parent</span> <span aria-hidden="true">▾</span>`
+      : `<span class="avatar" style="background:${p.color}">${esc(p.name[0])}</span><span>${esc(p.name)}</span> <span aria-hidden="true">▾</span>`;
     $("#profileMenu").innerHTML = S.profiles.map(x =>
-      `<li><button data-id="${x.id}" ${x.id === p.id ? 'aria-current="true"' : ""}><span class="avatar" style="background:${x.color}">${esc(x.name[0])}</span>${esc(x.name)}</button></li>`
-    ).join("");
+      `<li><button data-id="${x.id}" ${!state.parent && x.id === p.id ? 'aria-current="true"' : ""}><span class="avatar" style="background:${x.color}">${esc(x.name[0])}</span>${esc(x.name)}</button></li>`
+    ).join("") + `<li class="menu-sep"><button data-parent="1" ${state.parent ? 'aria-current="true"' : ""}><span class="avatar" style="background:#495057">P</span>Parent dashboard</button></li>`;
   }
 
   function renderSidebar() {
+    if (state.parent) {
+      $("#sidebar").innerHTML = `<h2>Parent</h2>` + S.profiles.map(x =>
+        `<button class="nav-item" data-jump="${x.id}"><span class="avatar" style="background:${x.color};width:20px;height:20px;font-size:11px">${esc(x.name[0])}</span>${esc(x.name)}</button>`).join("");
+      return;
+    }
     $("#sidebar").innerHTML = `<h2>Subjects</h2>` + allowedSubjects().map(s =>
       `<button class="nav-item" data-id="${s.id}" ${s.id === state.subject ? 'aria-current="true"' : ""}><span>${s.icon}</span>${esc(s.name)}</button>`
     ).join("");
@@ -89,8 +97,35 @@
     store.set("sh:side", open ? "1" : "0");
   }
 
+  // ---------- parent dashboard ----------
+  const loadAll = () => Promise.all(S.profiles.map(p => loadContent(p.id)));
+  const nice = d => { const [y, m, dd] = d.split("-").map(Number); return new Date(y, m - 1, dd).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }); };
+  const subjName = id => { const x = S.subjects.find(s => s.id === id); return x ? `${x.icon} ${x.name}` : "General"; };
+  function viewParent() {
+    const N = S.needs || {};
+    const blocks = S.profiles.map(p => {
+      const subs = p.subjects ? S.subjects.filter(s => p.subjects.includes(s.id)) : S.subjects;
+      const content = S.content[p.id] || {};
+      const rows = subs.map(s => {
+        const n = (content[s.id] || []).length;
+        return `<tr><td>${s.icon} ${esc(s.name)}</td><td>${n ? `<span class="ok">${n} set${n > 1 ? "s" : ""}</span>` : `<span class="wait">Placeholder</span>`}</td></tr>`;
+      }).join("");
+      const needs = (N[p.id] || []).slice().sort((a, b) => (a.due || "9999") < (b.due || "9999") ? -1 : 1);
+      const list = needs.length ? needs.map(n => `<li><b>${esc(subjName(n.subject))}</b>${n.due ? ` <span class="due">due ${esc(nice(n.due))}</span>` : ""}<br>${esc(n.what)}<br><small>${esc(n.why || "")}</small></li>`).join("")
+        : `<li>Nothing needed right now.</li>`;
+      return `<section class="card" id="parent-${p.id}">
+        <h2 style="margin-top:0"><span class="avatar" style="background:${p.color}">${esc(p.name[0])}</span> ${esc(p.name)}</h2>
+        <h3>Send me</h3><ul class="needs">${list}</ul>
+        <h3>Subjects</h3><table class="guide"><tbody>${rows}</tbody></table>
+      </section>`;
+    }).join("");
+    $("#main").innerHTML = `<div class="crumbs">Parent</div><h1>Parent dashboard</h1>
+      <p class="sub">What I still need from you, by kid. ${N.updated ? "Last updated " + esc(nice(N.updated)) + "." : ""} Photos of lists and study guides work fine.</p>${blocks}`;
+  }
+
   // ---------- views ----------
   function viewHome() {
+    if (state.parent) return viewParent();
     state.setId = null;
     const list = sets();
     $("#main").innerHTML = `
@@ -98,7 +133,7 @@
       <h1>${subject().icon} ${esc(subject().name)}</h1>
       <p class="sub">Pick a study set to practice.</p>
       ${list.length ? unitGroups(list) :
-        `<div class="card">Nothing here yet for ${esc(profile().name)}. New study sets will show up here.</div>`}
+        `<div class="card">Nothing here yet for ${esc(profile().name)}. Waiting on material. The Parent dashboard lists what to send.</div>`}
     `;
   }
 
@@ -522,13 +557,23 @@
     if (!t) return;
     if (t.id === "menuBtn") return setSide(document.body.classList.contains("side-hidden"));
     if (t.id === "profileBtn") { const m = $("#profileMenu"); m.hidden = !m.hidden; t.setAttribute("aria-expanded", !m.hidden); return; }
+    if (t.closest("#profileMenu") && t.dataset.parent) {
+      state.parent = true; $("#profileMenu").hidden = true; renderProfile(); renderSidebar();
+      loadAll().then(viewParent); return;
+    }
+    if (t.dataset.jump) {
+      const el = document.getElementById("parent-" + t.dataset.jump); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (window.innerWidth <= 800) setSide(false);
+      return;
+    }
     if (t.closest("#profileMenu") && t.dataset.id) {
+      state.parent = false;
       state.profile = t.dataset.id; store.set("sh:profile", state.profile);
       $("#profileMenu").hidden = true; renderProfile();
       fixSubject(); renderSidebar();
       loadContent(state.profile).then(viewHome); return;
     }
-    if (t.classList.contains("nav-item") && !t.disabled) {
+    if (t.classList.contains("nav-item") && !t.disabled && !t.dataset.jump) {
       state.subject = t.dataset.id; store.set("sh:subject", state.subject);
       renderSidebar(); viewHome();
       if (window.innerWidth <= 800) setSide(false);
