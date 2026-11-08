@@ -12,7 +12,6 @@ STUDY.needs = {
     { subject: "latin", what: "Chapter 3 vocabulary (numbers) and the next chapter's word list", why: "Next chapter quiz (not on the calendar yet)" },
     { subject: "math", what: "Study guide or textbook section for the next unit", why: "Next quiz (last ones were decimals and division)" },
     { subject: "civics", what: "Study guide for the next unit", why: "Next test (geography test was Oct 27)" },
-    { subject: "theology", due: "2026-11-23", what: "Nothing needed for the test set. Optional: memory verse practice", why: "Memory Verse #4, Matthew 5:14-16" }
   ],
   grace: [
     { subject: "math", what: "Topic list or study sheet (recent: comparing decimals, estimating products, 2x1 algorithm)", why: "Mathematics 4B/5 Accelerated quizzes" },

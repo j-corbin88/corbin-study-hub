@@ -159,3 +159,11 @@ table.guide td:nth-child(1){width:34px;font-weight:700}
 .needs small{color:var(--muted,#667)}
 .due{background:#fff3e0;color:#9c4a00;border-radius:6px;padding:1px 6px;font-size:13px}
 .wait{color:#9c4a00}
+
+/* memory verses */
+.verse{font-size:22px;line-height:2;font-family:var(--font-voice,Georgia,serif)}
+.vw{display:inline}
+button.vw.hid{font:inherit;border:0;border-bottom:2px solid #adb5bd;background:#f1f3f5;border-radius:6px;padding:0 6px;color:var(--ink,#333);cursor:pointer;letter-spacing:1px}
+.vok{color:#2b8a3e}.vno{color:#c92a2a;text-decoration:underline}
+.v-input{width:100%;font:inherit;font-size:18px;padding:10px;border:2px solid #cbd5e1;border-radius:12px}
+.order-line{min-height:60px;background:#f8f9fa;border-radius:12px;padding:8px 12px}

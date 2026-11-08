@@ -45,14 +45,38 @@
   fixSubject();
   const subject = () => S.subjects.find(s => s.id === state.subject);
   const sets = () => ((S.content[state.profile] || {})[state.subject]) || [];
-  const curSet = () => sets().find(x => x.id === state.setId);
+  const curSet = () => state.setId === REVIEW_ID ? reviewSet() : sets().find(x => x.id === state.setId);
   const bestKey = id => `sh:best:${state.profile}:${id}`;
+
+  // words a kid missed are remembered on this device so the mixed review can bring them back
+  const missKey = () => `sh:miss:${state.profile}`;
+  const getMiss = () => { try { return JSON.parse(store.get(missKey()) || "{}"); } catch (e) { return {}; } };
+  function recordMiss(w, setId, ok) {
+    if (!w || !w.word || !setId) return;
+    const m = getMiss(), k = setId + "|" + w.word;
+    if (ok) delete m[k]; else m[k] = (m[k] || 0) + 1;
+    store.set(missKey(), JSON.stringify(m));
+  }
+  const REVIEW_ID = "__review";
+  // a "virtual" set built fresh each time: missed words first, then random words from the subject's other sets
+  function reviewSet() {
+    const pool = [];
+    sets().filter(x => x.type === "vocab" || x.type === "spelling").forEach(x => x.words.forEach(w => pool.push(Object.assign({}, w, { _set: x.id }))));
+    if (pool.length < 4) return null;
+    const m = getMiss();
+    const missed = shuffle(pool.filter(w => m[w._set + "|" + w.word]));
+    const rest = shuffle(pool.filter(w => !m[w._set + "|" + w.word]));
+    const words = missed.slice(0, 12).concat(rest).slice(0, 12);
+    return { id: REVIEW_ID, type: "review", title: "Mixed review", unit: "", words, missedCount: Math.min(missed.length, 12) };
+  }
 
   // tabs shown for each kind of study set (the first one is the default)
   const TABS = {
     vocab: [["cards", "Flashcards"], ["quiz", "Quiz"], ["list", "Word list"]],
     test: [["test", "Practice test"], ["cards", "Flashcards"], ["order", "Story order"], ["guide", "Study guide"]],
-    spelling: [["spell", "Spelling quiz"], ["cards", "Flashcards"], ["list", "Word list"]]
+    spelling: [["spell", "Spelling quiz"], ["cards", "Flashcards"], ["list", "Word list"]],
+    review: [["quiz", "Mixed quiz"], ["cards", "Flashcards"]],
+    verse: [["vrecall", "Practice"], ["vtype", "Type it"], ["vorder", "Put in order"]]
   };
   // flashcards (and printed cards) come from the words of a vocab set, or the key terms of a test set
   const cardWords = x => (x.type === "test" ? x.terms : x.words);
@@ -132,9 +156,18 @@
       <div class="crumbs">${esc(profile().name)}</div>
       <h1>${subject().icon} ${esc(subject().name)}</h1>
       <p class="sub">Pick a study set to practice.</p>
+      ${reviewCard()}
       ${list.length ? unitGroups(list) :
         `<div class="card">Nothing here yet for ${esc(profile().name)}. Waiting on material. The Parent dashboard lists what to send.</div>`}
     `;
+  }
+
+  function reviewCard() {
+    const r = reviewSet();
+    if (!r) return "";
+    return `<div class="grid" style="margin-bottom:8px"><button class="card set-card" data-set="${REVIEW_ID}">
+      <div><span class="tag">Review</span></div><h3 style="margin-top:10px">🔁 Mixed review</h3>
+      <div class="sub" style="margin:0">${r.words.length} words from all lists${r.missedCount ? ` &middot; includes ${r.missedCount} you missed` : ""}</div></button></div>`;
   }
 
   // group sets under their "unit" heading (e.g. a book); sets with no unit come last under "Other"
@@ -153,9 +186,9 @@
     const best = store.get(bestKey(x.id));
     const isTest = x.type === "test";
     return `<button class="card set-card" data-set="${x.id}">
-      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? "Chapter review" : x.type === "spelling" ? "Spelling" : "Vocabulary"}</span></div>
+      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? "Chapter review" : x.type === "spelling" ? "Spelling" : x.type === "verse" ? "Memory verse" : "Vocabulary"}</span></div>
       <h3 style="margin-top:10px">${esc(x.title)}</h3>
-      <div class="sub" style="margin:0">${isTest ? x.questions.length + " questions" : x.words.length + " words"}${best ? ` &middot; best ${esc(best)}` : ""}</div>
+      <div class="sub" style="margin:0">${x.type === "verse" ? esc(x.ref) + (x.due ? " &middot; due " + esc(nice(x.due)) : "") : isTest ? x.questions.length + " questions" : x.words.length + " words"}${best ? ` &middot; best ${esc(best)}` : ""}</div>
     </button>`;
   }
 
@@ -176,6 +209,9 @@
       quiz: () => startQuiz(x),
       list: () => viewList(x),
       spell: () => startSpelling(x),
+      vrecall: () => viewVerseRecall(x),
+      vtype: () => viewVerseType(x),
+      vorder: () => viewVerseOrder(x),
       test: () => viewTestHome(x),
       order: () => viewOrder(x),
       guide: () => viewGuide(x)
@@ -338,6 +374,7 @@
       else if (i === n) b.classList.add("wrong");
     });
     if (ok) qz.score++; else { qz.missed.push(q.w); qz.missedQs.push(q); }
+    if (q.kind === "word-to-def" || q.kind === "def-to-word" || q.kind === "blank") recordMiss(q.w, q.w._set || qz.set.id, ok);
     const last = qz.i === qz.qs.length - 1;
     $("#fb").innerHTML = `<div class="feedback ${ok ? "good" : "bad"}">${ok ? "Correct!" : "Not quite."}
       <small><b>${esc(q.w.word)}</b>: ${esc(q.w.def)}</small>${q.note ? `<small class="note">${esc(q.note)}</small>` : ""}</div>
@@ -415,6 +452,7 @@
       $("#spCheck").remove();
       const ok = normWord(typed) === normWord(w.word);
       if (ok) sp.score++; else sp.missed.push(w);
+      recordMiss(w, sp.set.id, ok);
       spellFeedback(w, ok, typed);
     };
     $("#spCheck").onclick = check;
@@ -469,6 +507,102 @@
     const r = $("#spRetry"); if (r) r.onclick = () => startSpelling(sp.set, sp.missed.slice());
     $("#spAll").onclick = () => startSpelling(sp.set);
     $("#spCards").onclick = () => { state.mode = "cards"; viewSet(); };
+  }
+
+  // ---------- memory verses: hide more words each level, type it, put it in order ----------
+  const vWords = x => x.text.trim().split(/\s+/);
+  const vNorm = w => w.toLowerCase().replace(/[^a-z0-9']/g, "");
+  let vr = null;
+  function viewVerseRecall(x) {
+    vr = { x, level: vr && vr.x === x ? vr.level : 1, shown: {} };
+    drawVerse();
+  }
+  function drawVerse() {
+    const x = vr.x, W = vWords(x), n = W.length, fr = [0, .25, .5, .75, 1][vr.level];
+    // fixed scramble so the same words hide at each level (and harder levels hide a superset)
+    const rank = W.map((_, i) => i).sort((a, b) => ((a * 7919 + 13) % n) - ((b * 7919 + 13) % n));
+    const hide = new Set(rank.slice(0, Math.round(n * fr)));
+    const body = W.map((w, i) => {
+      if (!hide.has(i) || vr.shown[vr.level + ":" + i]) return `<span class="vw">${esc(w)}</span>`;
+      const mm = w.match(/^(.*?)([^A-Za-z0-9']*)$/), core = mm[1], tail = mm[2];
+      return `<button class="vw hid" data-vi="${i}" aria-label="Hidden word, tap to show">${esc(core[0] || "")}${"_".repeat(Math.max(2, core.length - 1))}</button>${esc(tail)}`;
+    }).join(" ");
+    $("#panel").innerHTML = `<div class="card">
+      <div class="sub" style="margin:0 0 6px">${esc(x.ref)} &middot; Level ${vr.level} of 4. Say the verse out loud, then tap a blank to check it.</div>
+      <div class="verse">${body}</div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn" id="vEasy" ${vr.level <= 0 ? "disabled" : ""}>Easier</button>
+        <button class="btn primary" id="vHard" ${vr.level >= 4 ? "disabled" : ""}>Hide more</button>
+        <button class="btn" id="vShow">Show all</button>
+        ${canSpeak ? `<button class="btn" id="vSay">🔊 Read it to me</button>` : ""}
+      </div></div>`;
+    $("#panel").querySelectorAll("[data-vi]").forEach(b => b.onclick = () => { vr.shown[vr.level + ":" + b.dataset.vi] = 1; drawVerse(); });
+    $("#vEasy").onclick = () => { vr.level = Math.max(0, vr.level - 1); drawVerse(); };
+    $("#vHard").onclick = () => { vr.level = Math.min(4, vr.level + 1); drawVerse(); };
+    $("#vShow").onclick = () => { vr.level = 0; drawVerse(); };
+    const say = $("#vSay"); if (say) say.onclick = () => speak(x.text);
+  }
+  // longest common subsequence of two word lists, to mark which verse words were typed right
+  function lcsMask(ref, typed) {
+    const a = ref.length, b = typed.length, t = Array.from({ length: a + 1 }, () => new Array(b + 1).fill(0));
+    for (let i = a - 1; i >= 0; i--) for (let j = b - 1; j >= 0; j--)
+      t[i][j] = ref[i] === typed[j] ? t[i + 1][j + 1] + 1 : Math.max(t[i + 1][j], t[i][j + 1]);
+    const ok = new Array(a).fill(false), extra = [];
+    let i = 0, j = 0;
+    while (i < a && j < b) {
+      if (ref[i] === typed[j]) { ok[i] = true; i++; j++; }
+      else if (t[i + 1][j] >= t[i][j + 1]) i++;
+      else { extra.push(typed[j]); j++; }
+    }
+    while (j < b) extra.push(typed[j++]);
+    return { ok, extra };
+  }
+  function viewVerseType(x) {
+    $("#panel").innerHTML = `<div class="card">
+      <p class="sub" style="margin-top:0">${esc(x.ref)}. Type the verse from memory, then check it.</p>
+      <textarea id="vIn" class="v-input" rows="6" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the verse"></textarea>
+      <div id="vErr" class="sp-err"></div>
+      <div class="row"><button class="btn primary" id="vCheck">Check</button></div>
+      <div id="vRes"></div></div>`;
+    $("#vCheck").onclick = () => {
+      const typed = $("#vIn").value.trim();
+      if (!typed) { $("#vErr").textContent = "Type the verse first."; return; }
+      $("#vErr").textContent = "";
+      const W = vWords(x), T = typed.split(/\s+/).map(vNorm).filter(Boolean);
+      const m = lcsMask(W.map(vNorm), T), right = m.ok.filter(Boolean).length, pct = Math.round(right / W.length * 100);
+      $("#vRes").innerHTML = `<div class="feedback ${pct === 100 && !m.extra.length ? "good" : "bad"}" style="margin-top:14px">
+        <b>${pct === 100 && !m.extra.length ? "Perfect! Word for word." : right + " of " + W.length + " words right (" + pct + "%)"}</b>
+        <div class="verse" style="margin-top:8px">${W.map((w, i) => `<span class="vw ${m.ok[i] ? "vok" : "vno"}">${esc(w)}</span>`).join(" ")}</div>
+        ${m.extra.length ? `<small>Extra or wrong words you typed: ${esc(m.extra.join(", "))}</small>` : ""}
+        <small>Green = right. Red = missing or different.</small></div>`;
+    };
+  }
+  function verseChunks(text) {
+    const parts = text.trim().split(/(?<=[.,;:])\s+/), out = [];
+    parts.forEach(p => {
+      const w = p.split(/\s+/);
+      if (w.length > 7) { const h = Math.ceil(w.length / 2); out.push(w.slice(0, h).join(" "), w.slice(h).join(" ")); }
+      else out.push(p);
+    });
+    return out;
+  }
+  function viewVerseOrder(x) {
+    const chunks = verseChunks(x.text);
+    let bank = shuffle(chunks.map((c, i) => ({ c, i }))), picked = [];
+    if (chunks.length > 1 && bank.every((b, k) => b.i === k)) bank = bank.reverse();
+    const draw = () => {
+      const done = !bank.length, right = done && picked.every((p, k) => p.i === k);
+      $("#panel").innerHTML = `<div class="card">
+        <p class="sub" style="margin-top:0">${esc(x.ref)}. Tap the pieces in the right order.</p>
+        <div class="verse order-line">${picked.length ? picked.map(p => `<span class="vw">${esc(p.c)}</span>`).join(" ") : '<span class="sub">Your verse goes here</span>'}</div>
+        <div class="row" style="margin:12px 0">${bank.map((b, k) => `<button class="btn" data-bk="${k}">${esc(b.c)}</button>`).join("")}</div>
+        ${done ? `<div class="feedback ${right ? "good" : "bad"}">${right ? "Perfect order!" : "Not quite. The right order:"}${right ? "" : `<div class="verse" style="margin-top:8px">${esc(x.text)}</div>`}</div>` : ""}
+        <div class="row"><button class="btn" id="oUndo" ${picked.length ? "" : "disabled"}>Undo</button><button class="btn" id="oAgain">${done ? "Try again" : "Start over"}</button></div></div>`;
+      $("#panel").querySelectorAll("[data-bk]").forEach(b => b.onclick = () => { picked.push(bank.splice(+b.dataset.bk, 1)[0]); draw(); });
+      $("#oUndo").onclick = () => { if (picked.length) { bank.push(picked.pop()); draw(); } };
+      $("#oAgain").onclick = () => viewVerseOrder(x);
+    };
+    draw();
   }
 
   // ---------- practice test (theology and other "test" sets) ----------
