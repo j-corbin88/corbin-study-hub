@@ -12,20 +12,35 @@
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const LETTERS = "ABCDE";
 
-  // read words aloud with the device's built-in voice (slow and clear for young spellers)
+  // read words aloud with the device's built-in voice (slow and clear for young speakers)
   const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
   function speak(text) {
     if (!canSpeak || !text) return;
+    const note = msg => { const el = document.getElementById("speakNote"); if (el) el.textContent = msg; };
     try {
-      speechSynthesis.cancel();
+      const ss = speechSynthesis;
+      // cancel only when something is playing (cancel-then-speak silently fails on iPad)
+      if (ss.speaking || ss.pending) ss.cancel();
+      if (ss.paused) ss.resume();
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "en-US"; u.rate = 0.5;
-      const vs = speechSynthesis.getVoices();
+      const vs = ss.getVoices();
       // Samantha is the clearest voice on iPad/iPhone; fall back to any US English voice
       const v = vs.find(v => /^samantha/i.test(v.name)) || vs.find(v => /^en[-_]US/i.test(v.lang));
       if (v) u.voice = v;
-      speechSynthesis.speak(u);
-    } catch (e) {}
+      u.onstart = () => note("");
+      u.onerror = e => { if (e.error !== "canceled" && e.error !== "interrupted") note("Sound didn't play (" + (e.error || "unknown") + "). Check the volume and that the ringer switch is not on silent."); };
+      ss.speak(u);
+    } catch (e) { note("Sound isn't available on this device."); }
+  }
+  // iPad/iPhone only allow speech after a tap: unlock it on the first touch with a silent word
+  if (canSpeak) {
+    const unlock = () => {
+      try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+      document.removeEventListener("pointerdown", unlock, true);
+    };
+    document.addEventListener("pointerdown", unlock, true);
+    try { speechSynthesis.getVoices(); } catch (e) {}
   }
 
   const S = STUDY;
@@ -436,7 +451,7 @@
         </div>
         <div class="blanks" aria-hidden="true">${blanksFor(w.word)}</div>
         <div style="margin:14px 0 4px"><input id="spIn" class="sp-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word"></div>
-        <div id="spErr" class="sp-err"></div>
+        <div id="spErr" class="sp-err"></div><div id="speakNote" class="sp-err"></div>
         <div class="row" style="justify-content:center"><button class="btn primary" id="spCheck">Check</button></div>
         <div id="spFb"></div>
       </div>`;
@@ -457,7 +472,6 @@
     };
     $("#spCheck").onclick = check;
     input.onkeydown = e => { if (e.key === "Enter") check(); };
-    if (canSpeak) setTimeout(() => speak(w.word), 300);
   }
   function spellFeedback(w, ok, typed) {
     const nextBtn = `<div style="margin-top:14px"><button class="btn primary" id="spNext">Next &rarr;</button></div>`;
@@ -529,10 +543,10 @@
     }).join(" ");
     $("#panel").innerHTML = `<div class="card">
       <div class="sub" style="margin:0 0 6px">${esc(x.ref)} &middot; Level ${vr.level} of 4. Say the verse out loud, then tap a blank to check it.</div>
-      <div class="verse">${body}</div>
+      <div class="verse">${body}</div><div id="speakNote" class="sp-err"></div>
       <div class="row" style="margin-top:14px">
         <button class="btn" id="vEasy" ${vr.level <= 0 ? "disabled" : ""}>Easier</button>
-        <button class="btn primary" id="vHard" ${vr.level >= 4 ? "disabled" : ""}>Hide more</button>
+        <button class="btn" id="vHard" ${vr.level >= 4 ? "disabled" : ""}>Hide more</button>
         <button class="btn" id="vShow">Show all</button>
         ${canSpeak ? `<button class="btn" id="vSay">🔊 Read it to me</button>` : ""}
       </div></div>`;

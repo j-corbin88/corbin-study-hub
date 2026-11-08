@@ -49,12 +49,12 @@ body.side-hidden .sidebar{margin-left:calc(var(--side) * -1)}
 .sub{color:var(--muted);margin:0 0 20px}
 .banner{background:#fff7e0;border:1px solid #f2dc9b;color:#6b5200;border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:14px}
 .btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 16px;font-weight:600}
-.btn:hover{background:var(--bg)}
+@media (hover:hover){.btn:hover{background:var(--bg)}}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.primary:hover{filter:brightness(1.08)}
+@media (hover:hover){.btn.primary:hover{filter:brightness(1.08)}}
 .btn.good{background:var(--good);border-color:var(--good);color:#fff}
 .btn.bad{background:var(--bad);border-color:var(--bad);color:#fff}
-.btn:disabled{opacity:.5;cursor:default}
+.btn:disabled{opacity:.5;cursor:default;background:var(--bg);color:var(--muted);border-color:var(--line)}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
