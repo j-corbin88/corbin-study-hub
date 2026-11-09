@@ -91,7 +91,8 @@
     test: [["test", "Practice test"], ["cards", "Flashcards"], ["order", "Story order"], ["guide", "Study guide"]],
     spelling: [["spell", "Spelling quiz"], ["cards", "Flashcards"], ["list", "Word list"]],
     review: [["quiz", "Mixed quiz"], ["cards", "Flashcards"]],
-    verse: [["vrecall", "Practice"], ["vtype", "Type it"], ["vorder", "Put in order"]]
+    verse: [["vrecall", "Practice"], ["vtype", "Type it"], ["vorder", "Put in order"]],
+    prompts: [["prompts", "Questions"]]
   };
   // flashcards (and printed cards) come from the words of a vocab set, or the key terms of a test set
   const cardWords = x => (x.type === "test" ? x.terms : x.words);
@@ -297,9 +298,9 @@
     const best = store.get(bestKey(x.id));
     const isTest = x.type === "test";
     return `<button class="card set-card" data-set="${x.id}">
-      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? "Chapter review" : x.type === "spelling" ? "Spelling" : x.type === "verse" ? "Memory verse" : "Vocabulary"}</span></div>
+      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? "Chapter review" : x.type === "spelling" ? "Spelling" : x.type === "verse" ? "Memory verse" : x.type === "prompts" ? "Study questions" : "Vocabulary"}</span></div>
       <h3 style="margin-top:10px">${esc(x.title)}</h3>
-      <div class="sub" style="margin:0">${x.type === "verse" ? esc(x.ref) + (x.due ? " &middot; due " + esc(nice(x.due)) : "") : isTest ? x.questions.length + " questions" : x.words.length + " words"}${best ? ` &middot; best ${esc(best)}` : ""}</div>
+      <div class="sub" style="margin:0">${x.type === "prompts" ? x.groups.reduce((n, g) => n + g.qs.length, 0) + " questions" : x.type === "verse" ? esc(x.ref) + (x.due ? " &middot; due " + esc(nice(x.due)) : "") : isTest ? x.questions.length + " questions" : x.words.length + " words"}${best ? ` &middot; best ${esc(best)}` : ""}</div>
     </button>`;
   }
 
@@ -320,6 +321,7 @@
       quiz: () => startQuiz(x),
       list: () => viewList(x),
       spell: () => startSpelling(x),
+      prompts: () => viewPrompts(x),
       vrecall: () => viewVerseRecall(x),
       vtype: () => viewVerseType(x),
       vorder: () => viewVerseOrder(x),
@@ -617,6 +619,25 @@
     const r = $("#spRetry"); if (r) r.onclick = () => startSpelling(sp.set, sp.missed.slice());
     $("#spAll").onclick = () => startSpelling(sp.set);
     $("#spCards").onclick = () => { state.mode = "cards"; viewSet(); };
+  }
+
+
+  // ---------- study questions: think it through, jot an answer, tick when ready ----------
+  function viewPrompts(x) {
+    const key = (n, f) => `sh:${f}:${state.profile}:${x.id}:${n}`;
+    const total = x.groups.reduce((n, g) => n + g.qs.length, 0);
+    const readyCount = () => x.groups.reduce((n, g) => n + g.qs.filter(q => store.get(key(q.n, "ready")) === "1").length, 0);
+    $("#panel").innerHTML = `<div class="card">
+      <p class="sub" style="margin-top:0">${esc(x.intro || "")} <b id="pReady"></b></p>
+      ${x.groups.map(g => `<h3 style="margin:18px 0 6px">${esc(g.title)}</h3>` + g.qs.map(q => `
+        <div class="pq"><div class="pq-t"><b>${q.n}.</b> ${esc(q.q)}</div>
+          <textarea class="v-input" rows="3" data-pn="${q.n}" placeholder="Jot your answer here (saved on this device)" aria-label="Answer to question ${q.n}">${esc(store.get(key(q.n, "ans")) || "")}</textarea>
+          <label class="pq-r"><input type="checkbox" data-pr="${q.n}" ${store.get(key(q.n, "ready")) === "1" ? "checked" : ""}> I can answer this</label></div>`).join("")).join("")}
+    </div>`;
+    const upd = () => { $("#pReady").textContent = `${readyCount()} of ${total} ready.`; };
+    $("#panel").querySelectorAll("[data-pn]").forEach(t => t.oninput = () => store.set(key(t.dataset.pn, "ans"), t.value));
+    $("#panel").querySelectorAll("[data-pr]").forEach(c => c.onchange = () => { store.set(key(c.dataset.pr, "ready"), c.checked ? "1" : "0"); upd(); });
+    upd();
   }
 
   // ---------- memory verses: hide more words each level, type it, put it in order ----------

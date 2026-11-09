@@ -144,3 +144,51 @@ STUDY.content.cole.theology.push(
   { id: "verse-4-matt-5-14-16", type: "verse", unit: "Memory verses", title: "Memory Verse #4", ref: "Matthew 5:14-16", due: "2026-11-23",
     text: "You are the light of the world. A city set on a hill cannot be hidden. Nor do people light a lamp and put it under a basket, but on a stand, and it gives light to all in the house. In the same way, let your light shine before others, so that they may see your good works and give glory to your Father who is in heaven." }
 );
+
+// Wink chapters 10-18 comprehension questions (from the class handout). Quiz Thu Nov 12.
+STUDY.content.cole.english.push({
+  id: "wink-ch-10-18-questions", type: "prompts", unit: "Wink", title: "Wink - Chapters 10-18 questions",
+  intro: "Think about each question, jot an answer, and tick it when you could answer it out loud.",
+  groups: [
+    { title: "Chapters 10-12", qs: [
+      { n: 1, q: "Memes are used as a form of bullying in this book. Did this make you think about how a meme can affect somebody?" },
+      { n: 2, q: "How does Ross cope with his anger? What do you do when you are really angry?" },
+      { n: 3, q: "What did Dr. Throckton tell Ross and his family that was different than his other doctor?" },
+      { n: 4, q: "Throughout the novel it was mentioned that Ross lost his mother to cancer when he was young. How do you think that affects Ross as he undergoes his own cancer treatment? Think critically." }
+    ] },
+    { title: "Chapters 13 and 14", qs: [
+      { n: 5, q: "What instrument does Ross learn to play?" },
+      { n: 6, q: "Abby gives Ross some bad news. What is it? What effect do you think this will have on Ross?" },
+      { n: 7, q: "Prediction: what role do you think Frank will play in Ross's life?" },
+      { n: 8, q: "Do you think Linda and Ross's dad are helpful and supportive to Ross while he is going through a very difficult time? Why or why not?" }
+    ] },
+    { title: "Chapters 15 and 16", qs: [
+      { n: 9, q: "Who walks in the door and surprises Ross?" },
+      { n: 10, q: "Do you think Abby is a good friend or not? Provide two examples from the book through the first 16 chapters." },
+      { n: 11, q: "Why do you think the author had Ross learn to play the guitar?" }
+    ] },
+    { title: "Chapters 17-18", qs: [
+      { n: 12, q: "What triggers the worries of death for Ross?" },
+      { n: 13, q: "Batpig vs. the anonymous troll: what does the comic refer to?" },
+      { n: 14, q: "Who does Ross suspect made the memes?" },
+      { n: 15, q: "Describe the bullying that Ross is experiencing." },
+      { n: 16, q: "Describe what happened in Ms. Bayer's class. Why do you think Ross responded the way he did to Jimmy?" }
+    ] }
+  ]
+});
+
+// Science: bacteria cell notes (from his notebook pages dated 10/30 and 11/2). Bacteria Cell quiz Thu Nov 12.
+STUDY.content.cole.science = [
+  { id: "bacteria-cell", type: "vocab", unit: "Bacteria", title: "Bacteria cell structure and reproduction",
+    words: [
+      { word: "cell wall", pos: "structure", def: "Protects the shape of the cell." },
+      { word: "cell membrane", pos: "structure", def: "Allows materials in and out of the cell." },
+      { word: "genetic material", pos: "structure", def: "Holds the instructions for the cell." },
+      { word: "ribosomes", pos: "structure", def: "Produce proteins." },
+      { word: "cytoplasm", pos: "structure", def: "Holds everything in place inside the cell." },
+      { word: "flagella", pos: "structure", def: "Used for movement." },
+      { word: "pili", pos: "structure", def: "Used for attachment." },
+      { word: "binary fission", pos: "reproduction", def: "Asexual reproduction: one bacterium splits into 2 (bi = 2, fission = split)." },
+      { word: "conjugation", pos: "reproduction", def: "Sexual reproduction in bacteria: two cells connect and share genetic material." }
+    ] }
+];

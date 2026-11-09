@@ -23,8 +23,8 @@ STUDY.plan = {
       { date: "2026-11-11", subject: "theology", subj: "Theology", kind: "test", title: "Theology test", ready: "St. Ignatius, 22 questions ready", setId: "ignatius-ch-4-6-7", studyLabel: "Theology", practice: "practice test" },
       { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Lesson 4 spelling and vocab quiz", needs: "needs word list", send: "Lesson 4 spelling list", studyKey: "eng-l4", studyLabel: "English spelling and vocab", studyNeeds: "needs lists" },
       { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 4 quiz", needs: "needs definitions", send: "Vocab Unit 4 definitions", studyKey: "eng-l4", studyLabel: "English spelling and vocab", studyNeeds: "needs lists" },
-      { date: "2026-11-12", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 9-18 quiz", needs: "needs chapter notes", send: "Wink Ch. 9-18 notes", studyLabel: "Wink Ch. 9-18", studyNeeds: "needs notes" },
-      { date: "2026-11-12", subject: "science", subj: "Science", kind: "quiz", title: "Bacteria Cell quiz", needs: "needs notes. Extra credit too", send: "Bacteria cell notes", studyLabel: "Bacteria cell", studyNeeds: "needs notes" },
+      { date: "2026-11-12", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 9-18 quiz", ready: "Chapter questions and vocab ready", setId: "wink-ch-10-18-questions", studyLabel: "Wink Ch. 9-18", practice: "chapter questions" },
+      { date: "2026-11-12", subject: "science", subj: "Science", kind: "quiz", title: "Bacteria Cell quiz", ready: "9 cards and a quiz ready", setId: "bacteria-cell", studyLabel: "Bacteria cell", practice: "flashcards and quiz" },
       { date: "2026-11-23", subject: "theology", subj: "Theology", kind: "verse", title: "Memory Verse #4", ready: "Matthew 5:14-16", setId: "verse-4-matt-5-14-16", studyLabel: "Memory Verse #4", practice: "Matthew 5:14-16" }
     ],
     coming: [

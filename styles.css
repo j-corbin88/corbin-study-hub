@@ -194,3 +194,9 @@ button.vw.hid{font:inherit;border:0;border-bottom:2px solid #adb5bd;background:#
 .wleg i.d{border:1.5px dashed var(--muted)}
 .wsoon{background:var(--bg);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--muted);line-height:1.55}
 @supports not (grid-template-rows: subgrid){.wday{display:block}}
+
+/* study questions */
+.pq{padding:10px 0;border-bottom:1px solid var(--line)}
+.pq:last-child{border-bottom:0}
+.pq-t{margin-bottom:8px;line-height:1.45}
+.pq-r{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px;color:var(--muted)}
