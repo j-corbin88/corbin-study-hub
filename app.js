@@ -381,29 +381,34 @@
   let fc = null;
   function startCards(x, words) {
     const base = words || cardWords(x);
-    fc = { deck: shuffle(base), i: 0, flipped: false, missed: [], known: 0, total: base.length, set: x };
+    fc = { deck: shuffle(base), i: 0, flipped: false, marks: [], total: base.length, set: x };
     drawCard();
   }
   function drawCard() {
     const p = $("#panel");
     if (fc.i >= fc.deck.length) {
+      const known = fc.marks.filter(m => m === "k").length;
+      const todo = fc.deck.filter((_, k) => fc.marks[k] !== "k");
+      const skipped = fc.deck.filter((_, k) => !fc.marks[k]).length;
       const hasQuiz = fc.set.type === "test" ? "Take the practice test" : fc.set.type === "spelling" ? "Take the spelling quiz" : "Take the quiz";
       p.innerHTML = `<div class="card" style="text-align:center">
         <h2>Deck complete</h2>
-        <p class="sub">You knew ${fc.known} of ${fc.total}.</p>
+        <p class="sub">You knew ${known} of ${fc.total}.${skipped ? ` ${skipped} skipped.` : ""}</p>
         <div class="row" style="justify-content:center">
-          ${fc.missed.length ? `<button class="btn primary" id="again">Study the ${fc.missed.length} I missed</button>` : ""}
+          ${todo.length ? `<button class="btn primary" id="again">Study the ${todo.length} I haven't got yet</button>` : ""}
+          <button class="btn" id="backCards">&larr; Back to the cards</button>
           <button class="btn" id="restart">Start over</button>
           <button class="btn" data-goquiz>${hasQuiz}</button>
         </div></div>${printRow}`;
       $("#printCards").onclick = () => printCards(fc.set);
-      const a = $("#again"); if (a) a.onclick = () => startCards(fc.set, fc.missed);
+      const a = $("#again"); if (a) a.onclick = () => startCards(fc.set, todo);
+      $("#backCards").onclick = () => { fc.i = fc.deck.length - 1; fc.flipped = false; drawCard(); };
       $("#restart").onclick = () => startCards(fc.set);
       return;
     }
     const w = fc.deck[fc.i];
     p.innerHTML = `
-      <div class="sub" style="margin-bottom:0">Card ${fc.i + 1} of ${fc.deck.length}</div>
+      <div class="sub" style="margin-bottom:0">Card ${fc.i + 1} of ${fc.deck.length}${fc.marks[fc.i] === "k" ? " &middot; marked: I know it" : fc.marks[fc.i] === "m" ? " &middot; marked: still learning" : ""}</div>
       <div class="progress"><i style="width:${(fc.i / fc.deck.length) * 100}%"></i></div>
       <div class="flash-wrap">
         <div class="flash ${fc.flipped ? "flipped" : ""}" id="flash" role="button" tabindex="0" aria-label="Flip card">
@@ -412,17 +417,23 @@
         </div>
       </div>
       <div class="flash-controls">
-        <button class="btn bad" id="miss">✗ Still learning</button>
+        <button class="btn" id="prev" ${fc.i === 0 ? "disabled" : ""}>&larr; Back</button>
         <button class="btn" id="flip">Flip</button>
         ${canSpeak && fc.set.type === "spelling" ? `<button class="btn" id="hearCard">🔊 Hear it</button>` : ""}
+        <button class="btn" id="skip">Next &rarr;</button>
+      </div>
+      <div class="flash-controls">
+        <button class="btn bad" id="miss">✗ Still learning</button>
         <button class="btn good" id="know">✓ I know it</button>
       </div>${printRow}`;
     $("#printCards").onclick = () => printCards(fc.set);
     const hc = $("#hearCard"); if (hc) hc.onclick = () => speak(w.word);
     const flip = () => { fc.flipped = !fc.flipped; $("#flash").classList.toggle("flipped", fc.flipped); };
     $("#flash").onclick = flip; $("#flip").onclick = flip;
-    $("#know").onclick = () => { fc.known++; nextCard(); };
-    $("#miss").onclick = () => { fc.missed.push(w); nextCard(); };
+    $("#know").onclick = () => { fc.marks[fc.i] = "k"; nextCard(); };
+    $("#miss").onclick = () => { fc.marks[fc.i] = "m"; nextCard(); };
+    $("#skip").onclick = nextCard;
+    $("#prev").onclick = () => { if (fc.i > 0) { fc.i--; fc.flipped = false; drawCard(); } };
   }
   function nextCard() { fc.i++; fc.flipped = false; drawCard(); }
 
@@ -863,8 +874,10 @@
     if (!state.setId) return;
     if (state.mode === "cards" && fc && fc.i < fc.deck.length) {
       if (e.key === " " || e.key === "Enter") { if (e.target.tagName === "BUTTON") return; e.preventDefault(); $("#flash").click(); }
-      if (e.key === "ArrowRight") $("#know").click();
-      if (e.key === "ArrowLeft") $("#miss").click();
+      if (e.key === "ArrowRight") $("#skip").click();
+      if (e.key === "ArrowLeft") $("#prev").click();
+      if (e.key === "ArrowUp") { e.preventDefault(); $("#know").click(); }
+      if (e.key === "ArrowDown") { e.preventDefault(); $("#miss").click(); }
     }
     if (qz && qz.i < qz.qs.length && !qz.answered && $("#panel .opt:not(:disabled)")) {
       const k = e.key.toLowerCase();
