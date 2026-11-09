@@ -20,6 +20,23 @@ STUDY.content.margaux = {
         { word: "brush", pic: "🪥", hl: "br", def: "Something you use to clean or comb.", sentence: "I brush my teeth." },
         { word: "don't", hl: "'", def: "do not", sentence: "I don't like spiders.", note: "don't means do not. The apostrophe takes the place of the letter o." }
       ]
+    },
+    {
+      id: "ng-words",
+      type: "spelling",
+      title: "-ng Words",
+      unit: "Spelling",
+      words: [
+        { word: "long",  pic: "📏", hl: "ng", def: "Not short.", sentence: "The snake is very long." },
+        { word: "lung",  pic: "🫁", hl: "ng", def: "The part of your body you breathe with.", sentence: "I breathe air into my lung." },
+        { word: "wing",  pic: "🪽", hl: "ng", def: "What a bird uses to fly.", sentence: "The bird flapped its wing." },
+        { word: "bang",  pic: "💥", hl: "ng", def: "A loud sound.", sentence: "The door shut with a bang." },
+        { word: "king",  pic: "👑", hl: "ng", def: "A man who rules a land.", sentence: "The king wears a crown." },
+        { word: "song",  pic: "🎵", hl: "ng", def: "Words you sing with music.", sentence: "We sing a song at school." },
+        { word: "sang",  pic: "🎤", hl: "ng", def: "Past tense of sing.", sentence: "She sang a happy song." },
+        { word: "thing", pic: "📦", hl: "ng", def: "An object or something.", sentence: "What is that thing on the table?" },
+        { word: "hung",  pic: "🖼️", hl: "ng", def: "Past tense of hang.", sentence: "We hung the picture on the wall." }
+      ]
     }
   ]
 };
