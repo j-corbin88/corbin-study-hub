@@ -140,6 +140,102 @@
   const loadAll = () => Promise.all(S.profiles.map(p => loadContent(p.id)));
   const nice = d => { const [y, m, dd] = d.split("-").map(Number); return new Date(y, m - 1, dd).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }); };
   const subjName = id => { const x = S.subjects.find(s => s.id === id); return x ? `${x.icon} ${x.name}` : "General"; };
+
+  // ---------- week plan (parent dashboard) ----------
+  const pad2 = n => String(n).padStart(2, "0");
+  const isoD = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  const parseD = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const addD = (d, n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
+  const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const short = d => `${MON[d.getMonth()]} ${d.getDate()}`;
+
+  // spread study sessions over the evenings before each test, quiz or verse, and pull light review forward on quiet nights
+  function planSessions(plan, fromISO) {
+    const sessions = {}, load = {};
+    const ev = d => plan.evenings[d.getDay()];
+    const skip = new Set(); // no-class days
+    (plan.coming || []).forEach(c => { /* text only */ });
+    const room = (d, mins, free) => { const e = ev(d); return e && e.cap > 0 && (!free || e.free) && (load[isoD(d)] || 0) + mins <= e.cap; };
+    const add = (d, s) => { const k = isoD(d); (sessions[k] = sessions[k] || []).push(s); load[k] = (load[k] || 0) + s.min; };
+    const groups = {};
+    plan.due.filter(x => x.kind !== "task").forEach(x => {
+      const k = x.studyKey || (x.date + "|" + x.title);
+      (groups[k] = groups[k] || Object.assign({}, x));
+    });
+    const prio = { test: 0, quiz: 1, verse: 2 };
+    Object.values(groups).sort((a, b) => prio[a.kind] - prio[b.kind] || (a.date < b.date ? -1 : 1)).forEach(t => {
+      const mins = t.kind === "test" ? [25, 20] : t.kind === "verse" ? [10, 10, 10] : [15, 15];
+      const free = t.kind === "verse";
+      const days = [];
+      for (let d = addD(parseD(t.date), -1), n = 0; n < 21 && days.length < mins.length && isoD(d) >= fromISO; d = addD(d, -1), n++) {
+        if (room(d, mins[0], free)) days.push(d);
+      }
+      days.reverse().forEach((d, i) => add(d, {
+        label: t.studyLabel || t.title, min: mins[i], setId: t.setId, subject: t.subject,
+        sub: t.setId ? t.practice : (t.studyNeeds || t.needs)
+      }));
+    });
+    // quiet free evenings: add one short review from what already exists
+    let f = 0;
+    const last = addD(parseD(fromISO), 14);
+    for (let d = parseD(fromISO); d <= last; d = addD(d, 1)) {
+      const e = ev(d);
+      if (!e || !e.free || (load[isoD(d)] || 0) >= 20 || !(plan.fillers || []).length) continue;
+      const fl = plan.fillers[f++ % plan.fillers.length];
+      add(d, { label: fl.label, min: 10, setId: fl.setId, subject: fl.subject, sub: fl.practice, filler: true });
+    }
+    return { sessions, load };
+  }
+
+  function weekCard(profileId, which) {
+    const plan = (S.plan || {})[profileId];
+    if (!plan) return "";
+    const now = new Date(), dow = now.getDay();
+    const today = isoD(now);
+    const base = dow === 0 ? addD(now, 1) : dow === 6 ? addD(now, 2) : addD(now, 1 - dow);
+    const start = addD(base, which * 7), fri = addD(start, 4);
+    const { sessions, load } = planSessions(plan, dow === 0 || dow === 6 ? isoD(base) : today);
+    const cardH = (cls, title, sub, open) => {
+      const body = `<b>${esc(title)}</b><small>${sub}</small>`;
+      return open ? `<button class="it ${cls}" data-open="${esc(JSON.stringify(open))}">${body}</button>` : `<div class="it ${cls}">${body}</div>`;
+    };
+    const openOf = (setId, subject) => setId ? { p: profileId, s: subject, set: setId } : null;
+    const days = [0, 1, 2, 3, 4].map(i => {
+      const d = addD(start, i), k = isoD(d), e = plan.evenings[d.getDay()] || {};
+      const due = plan.due.filter(x => x.date === k).map(x =>
+        cardH(x.setId ? "ok" : "need", x.title, esc(x.subj) + " &middot; " + esc(x.setId ? (x.ready || "ready") : (x.needs || "")), openOf(x.setId, x.subject))).join("");
+      const ses = (sessions[k] || []).map(s =>
+        cardH((s.setId ? "ok" : "need") + " dash", s.label, `${s.min} min &middot; ${esc(s.sub || "")}`, openOf(s.setId, s.subject))).join("");
+      const tot = load[k] || 0;
+      return `<div class="wday${k === today ? " today" : ""}"><p class="wdh">${DOW[d.getDay()]}<span>${short(d)}${k === today ? " &middot; today" : ""} &middot; ${esc(e.label || "")}</span></p>
+        <div class="wblk"><p class="wsec">Due</p>${due || '<p class="wnone">Nothing due</p>'}</div>
+        <div class="wblk"><p class="wsec">Study</p>${ses || '<p class="wnone">No study</p>'}</div>
+        <p class="wtot">${tot ? tot + " min study" : "No study"}</p></div>`;
+    }).join("");
+    // what still needs to be sent for this week
+    const missing = plan.due.filter(x => !x.setId && x.send && x.date >= isoD(start) && x.date <= isoD(fri) && x.date >= today);
+    let bar;
+    if (missing.length) {
+      const gated = missing.filter(x => x.kind !== "task"), first = parseD((gated.length ? gated : missing).map(x => x.date).sort()[0]);
+      bar = `<div class="wbar warn"><b>Needed before ${DOW[first.getDay()]}:</b> ${esc(missing.map(x => x.send).join(", "))}</div>`;
+    } else {
+      bar = `<div class="wbar good"><b>Nothing needed from you${which ? " yet" : " this week"}.</b> ${which ? "Nothing graded is on the calendar for this week so far. New quizzes get added as teachers post them." : "Everything due has study material."}</div>`;
+    }
+    const coming = (plan.coming || []).filter(c => c.date > isoD(fri)).slice(0, 5)
+      .map(c => `${DOW[parseD(c.date).getDay()]} ${short(parseD(c.date))} ${esc(c.text)}`).join(" &middot; ");
+    return `<section class="card" id="parent-week">
+      <div class="wtop"><h2 style="margin:0">${esc(S.profiles.find(p => p.id === profileId).name)}'s week</h2>
+        <div class="seg" role="group" aria-label="Week">
+          <button data-week="0" aria-pressed="${which === 0}">This week</button><button data-week="1" aria-pressed="${which === 1}">Next week</button></div>
+        <span class="sub" style="margin:0">${short(start)} - ${short(fri)}${plan.updated ? " &middot; updated " + esc(short(parseD(plan.updated))) : ""}</span></div>
+      ${bar}
+      <div class="wscroll"><div class="wwk">${days}</div></div>
+      <div class="wleg"><span><i style="background:#ebfbee"></i>Ready (tap to open)</span><span><i style="background:#fff4e6"></i>Needs material from you</span><span><i class="d"></i>Dashed = study session</span></div>
+      ${coming ? `<div class="wsoon"><b>Coming up</b> &nbsp; ${coming}</div>` : ""}
+    </section>`;
+  }
+  let weekWhich = 0;
   function viewParent() {
     const N = S.needs || {};
     const blocks = S.profiles.map(p => {
@@ -159,7 +255,7 @@
       </section>`;
     }).join("");
     $("#main").innerHTML = `<div class="crumbs">Parent</div><h1>Parent dashboard</h1>
-      <p class="sub">What I still need from you, by kid. ${N.updated ? "Last updated " + esc(nice(N.updated)) + "." : ""} Photos of lists and study guides work fine.</p>${blocks}`;
+      <p class="sub">What I still need from you, by kid. ${N.updated ? "Last updated " + esc(nice(N.updated)) + "." : ""} Photos of lists and study guides work fine.</p>${weekCard("cole", weekWhich)}${blocks}`;
   }
 
   // ---------- views ----------
@@ -708,6 +804,14 @@
     if (t.closest("#profileMenu") && t.dataset.parent) {
       state.parent = true; $("#profileMenu").hidden = true; renderProfile(); renderSidebar();
       loadAll().then(viewParent); return;
+    }
+    if (t.dataset.week) { weekWhich = +t.dataset.week; return viewParent(); }
+    if (t.dataset.open) {
+      const o = JSON.parse(t.dataset.open);
+      state.parent = false; state.profile = o.p; state.subject = o.s; state.setId = o.set; state.mode = null;
+      store.set("sh:profile", state.profile); store.set("sh:subject", state.subject);
+      renderProfile(); renderSidebar();
+      loadContent(state.profile).then(viewSet); return;
     }
     if (t.dataset.jump) {
       const el = document.getElementById("parent-" + t.dataset.jump); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });

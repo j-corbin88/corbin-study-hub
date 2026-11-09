@@ -1,0 +1,36 @@
+// Cole's week plan. The daily check keeps "due" and "coming" up to date from his assignments calendar.
+// The study sessions are worked out by the site from the due items (see weekPlan in app.js).
+// kind: test | quiz | verse | task (tasks get no study sessions).
+// setId: a built study set (makes the item green and tappable); leave it out while waiting on material.
+window.STUDY = window.STUDY || { content: {} };
+STUDY.plan = {
+  cole: {
+    updated: "2026-11-09",
+    // evening capacity in minutes by weekday number (0 = Sun). free: true marks evenings used for head starts.
+    evenings: {
+      1: { label: "Soccer night", cap: 40 },
+      2: { label: "Free evening", cap: 70, free: true },
+      3: { label: "Soccer night", cap: 40 },
+      4: { label: "Free evening", cap: 70, free: true },
+      5: { label: "No homework", cap: 0 }
+    },
+    fillers: [
+      { subject: "english", label: "English mixed review", setId: "__review", practice: "keep words fresh" },
+      { subject: "theology", label: "Theology review", setId: "ignatius-ch-4-6-7", practice: "missed questions" }
+    ],
+    due: [
+      { date: "2026-11-09", subject: "science", subj: "Science", kind: "task", title: "Lab Safety #2", needs: "needs notes", send: "Lab safety notes" },
+      { date: "2026-11-11", subject: "theology", subj: "Theology", kind: "test", title: "Theology test", ready: "St. Ignatius, 22 questions ready", setId: "ignatius-ch-4-6-7", studyLabel: "Theology", practice: "practice test" },
+      { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Lesson 4 spelling and vocab quiz", needs: "needs word list", send: "Lesson 4 spelling list", studyKey: "eng-l4", studyLabel: "English spelling and vocab", studyNeeds: "needs lists" },
+      { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 4 quiz", needs: "needs definitions", send: "Vocab Unit 4 definitions", studyKey: "eng-l4", studyLabel: "English spelling and vocab", studyNeeds: "needs lists" },
+      { date: "2026-11-12", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 9-18 quiz", needs: "needs chapter notes", send: "Wink Ch. 9-18 notes", studyLabel: "Wink Ch. 9-18", studyNeeds: "needs notes" },
+      { date: "2026-11-12", subject: "science", subj: "Science", kind: "quiz", title: "Bacteria Cell quiz", needs: "needs notes. Extra credit too", send: "Bacteria cell notes", studyLabel: "Bacteria cell", studyNeeds: "needs notes" },
+      { date: "2026-11-23", subject: "theology", subj: "Theology", kind: "verse", title: "Memory Verse #4", ready: "Matthew 5:14-16", setId: "verse-4-matt-5-14-16", studyLabel: "Memory Verse #4", practice: "Matthew 5:14-16" }
+    ],
+    coming: [
+      { date: "2026-11-21", text: "Robotics: Capital Beltway Challenge" },
+      { date: "2026-11-23", text: "Memory Verse #4 due" },
+      { date: "2026-11-25", text: "No classes (Thanksgiving break, through Nov 27)" }
+    ]
+  }
+};
