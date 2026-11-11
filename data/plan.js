@@ -5,7 +5,7 @@
 window.STUDY = window.STUDY || { content: {} };
 STUDY.plan = {
   cole: {
-    updated: "2026-11-10",
+    updated: "2026-11-11",
     // evening capacity in minutes by weekday number (0 = Sun). free: true marks evenings used for head starts.
     evenings: {
       1: { label: "Soccer night", cap: 40 },
@@ -19,20 +19,17 @@ STUDY.plan = {
       { subject: "theology", label: "Theology review", setId: "ignatius-ch-4-6-7", practice: "missed questions" }
     ],
     due: [
-      { date: "2026-11-10", subject: "english", subj: "English", kind: "task", title: "Nouns 3.1 HW" },
-      { date: "2026-11-10", subject: "civics", subj: "Civics", kind: "task", title: "Textbook scavenger hunt" },
-      { date: "2026-11-10", subject: "latin", subj: "Latin", kind: "task", title: "Ch 3: Emotion Words, Part 1" },
       { date: "2026-11-11", subject: "theology", subj: "Theology", kind: "test", title: "Theology test", ready: "St. Ignatius, 22 questions ready", setId: "ignatius-ch-4-6-7", studyLabel: "Theology", practice: "practice test" },
       { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Lesson 4 spelling and vocab quiz", needs: "needs word list", send: "Lesson 4 spelling list", studyKey: "eng-l4", studyLabel: "English spelling and vocab", studyNeeds: "needs lists" },
       { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 4 quiz", needs: "needs definitions", send: "Vocab Unit 4 definitions", studyKey: "eng-l4", studyLabel: "English spelling and vocab", studyNeeds: "needs lists" },
-      { date: "2026-11-12", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 9-18 quiz", ready: "Chapter questions and vocab ready", setId: "wink-ch-10-18-questions", studyLabel: "Wink Ch. 9-18", practice: "chapter questions" },
+      { date: "2026-11-13", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 9-18 quiz", ready: "Chapter questions and vocab ready", setId: "wink-ch-10-18-questions", studyLabel: "Wink Ch. 9-18", practice: "chapter questions" },
       { date: "2026-11-12", subject: "science", subj: "Science", kind: "quiz", title: "Bacteria Cell quiz", ready: "9 cards and a quiz ready", setId: "bacteria-cell", studyLabel: "Bacteria cell", practice: "flashcards and quiz" },
       { date: "2026-11-23", subject: "theology", subj: "Theology", kind: "verse", title: "Memory Verse #4", ready: "Matthew 5:14-16", setId: "verse-4-matt-5-14-16", studyLabel: "Memory Verse #4", practice: "Matthew 5:14-16" }
     ],
     coming: [
       { date: "2026-11-21", text: "Robotics: Capital Beltway Challenge" },
       { date: "2026-11-23", text: "Memory Verse #4 due" },
-      { date: "2026-11-25", text: "No classes (Thanksgiving break, through Nov 27)" }
+      { date: "2026-11-25", text: "No classes (Thanksgiving break, Nov 25-27 and Nov 30)" }
     ]
   }
 };
