@@ -5,7 +5,7 @@
 window.STUDY = window.STUDY || { content: {} };
 STUDY.plan = {
   cole: {
-    updated: "2026-11-10",
+    updated: "2026-11-11",
     // evening capacity in minutes by weekday number (0 = Sun). free: true marks evenings used for head starts.
     evenings: {
       1: { label: "Soccer night", cap: 40 },
@@ -23,6 +23,10 @@ STUDY.plan = {
       { date: "2026-11-10", subject: "english", subj: "English", kind: "task", title: "Nouns 3.1 HW" },
       { date: "2026-11-10", subject: "civics", subj: "Civics", kind: "task", title: "Textbook scavenger hunt" },
       { date: "2026-11-10", subject: "latin", subj: "Latin", kind: "task", title: "Ch 3: Emotion Words, Part 1" },
+      { date: "2026-11-11", subject: "latin", subj: "Latin", kind: "task", title: "Ch 3: Emotion Words, Part 2" },
+      { date: "2026-11-11", subject: "math", subj: "Math", kind: "task", title: "Review worksheet: multiplying decimals and whole numbers (and correct homework)" },
+      { date: "2026-11-11", subject: "theology", subj: "Theology", kind: "task", title: "SICJ scavenger hunt, Ch 4, 6, 7" },
+      { date: "2026-11-11", subject: "art", subj: "Art", kind: "task", title: "Frankenfish final artwork" },
       { date: "2026-11-11", subject: "theology", subj: "Theology", kind: "test", title: "Theology test", ready: "St. Ignatius, 22 questions ready", setId: "ignatius-ch-4-6-7", studyLabel: "Theology", practice: "practice test" },
       { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Lesson 4 spelling list", unit: "Unit 4", needs: "waiting on the word list", send: "Lesson 4 spelling list", studyLabel: "Lesson 4 spelling", studyNeeds: "needs word list" },
       { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 4 quiz", ready: "Light words (ch. 4), 7 words ready", setId: "light-words", studyLabel: "Light words", practice: "flashcards and quiz" },
