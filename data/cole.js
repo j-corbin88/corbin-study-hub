@@ -193,8 +193,8 @@ STUDY.content.cole.science = [
     ] }
 ];
 
-// Science: light words (from his handwritten cards; the cards had no definitions, so these are kid-friendly ones to check against class notes).
-STUDY.content.cole.science.push({
+// English: light words (Growing Your Vocabulary, Chapter 4: Light and its Travels).
+STUDY.content.cole.english.push({
   id: "light-words", type: "vocab", unit: "Light words", title: "Light words",
   words: [
     { word: "luminous", pos: "adjective", def: "Filled with light. (Root lumin = light.)", sentence: "The moon looks luminous, but it only reflects the sun's light." },
