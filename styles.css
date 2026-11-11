@@ -114,6 +114,8 @@ table.words{width:100%;border-collapse:collapse;background:var(--panel);border:1
 
 .unit-head{font-size:20px;margin:26px 0 12px}
 .unit-head:first-of-type{margin-top:0}
+.unit-due{font-size:13px;font-weight:600;color:var(--muted);margin-left:8px}
+.wait-card{border-style:dashed;opacity:.7;cursor:default}
 
 /* printable flash cards */
 #printSheet{display:none}

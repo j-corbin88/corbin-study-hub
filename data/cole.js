@@ -195,7 +195,7 @@ STUDY.content.cole.science = [
 
 // English: light words (Growing Your Vocabulary, Chapter 4: Light and its Travels).
 STUDY.content.cole.english.push({
-  id: "light-words", type: "vocab", unit: "Light words", title: "Light words",
+  id: "light-words", type: "vocab", unit: "Unit 4", title: "Light words (Chapter 4)",
   words: [
     { word: "luminous", pos: "adjective", def: "Filled with light. (Root lumin = light.)", sentence: "The moon looks luminous, but it only reflects the sun's light." },
     { word: "luminary", pos: "noun", def: "A very inspiring or influential person. Also, an object that gives off light. (Root lumin = light.)", sentence: "The famous scientist was a luminary in her field." },

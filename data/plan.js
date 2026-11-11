@@ -24,7 +24,7 @@ STUDY.plan = {
       { date: "2026-11-10", subject: "civics", subj: "Civics", kind: "task", title: "Textbook scavenger hunt" },
       { date: "2026-11-10", subject: "latin", subj: "Latin", kind: "task", title: "Ch 3: Emotion Words, Part 1" },
       { date: "2026-11-11", subject: "theology", subj: "Theology", kind: "test", title: "Theology test", ready: "St. Ignatius, 22 questions ready", setId: "ignatius-ch-4-6-7", studyLabel: "Theology", practice: "practice test" },
-      { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Lesson 4 spelling and vocab quiz", needs: "needs word list", send: "Lesson 4 spelling list", studyLabel: "Lesson 4 spelling", studyNeeds: "needs word list" },
+      { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Lesson 4 spelling list", unit: "Unit 4", needs: "waiting on the word list", send: "Lesson 4 spelling list", studyLabel: "Lesson 4 spelling", studyNeeds: "needs word list" },
       { date: "2026-11-11", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 4 quiz", ready: "Light words (ch. 4), 7 words ready", setId: "light-words", studyLabel: "Light words", practice: "flashcards and quiz" },
       { date: "2026-11-13", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 9-18 quiz", ready: "Chapter questions and vocab ready", setId: "wink-ch-10-18-questions", studyLabel: "Wink Ch. 9-18", practice: "chapter questions" },
       { date: "2026-11-12", subject: "science", subj: "Science", kind: "quiz", title: "Bacteria Cell quiz", ready: "9 cards and a quiz ready", setId: "bacteria-cell", studyLabel: "Bacteria cell", practice: "flashcards and quiz" },

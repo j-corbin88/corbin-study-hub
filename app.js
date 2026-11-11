@@ -282,16 +282,31 @@
       <div class="sub" style="margin:0">${r.words.length} words from all lists${r.missedCount ? ` &middot; includes ${r.missedCount} you missed` : ""}</div></button></div>`;
   }
 
-  // group sets under their "unit" heading (e.g. a book); sets with no unit come last under "Other"
+  // group sets under their "unit" heading (a unit or book); each heading shows the quiz date from the week plan.
+  // Inside a unit: vocabulary, spelling, then questions/tests. Plan items with a "unit" and no study set yet show as "waiting" rows.
+  const TYPE_ORDER = { vocab: 0, spelling: 1, prompts: 2, test: 2, verse: 3 };
   function unitGroups(list) {
-    const order = [];
-    const by = {};
-    list.forEach(x => { const u = x.unit || ""; if (!by[u]) { by[u] = []; order.push(u); } by[u].push(x); });
-    order.sort((a, b) => (a === "") - (b === ""));
+    const plan = ((S.plan || {})[state.profile] || {}).due || [];
+    const order = [], by = {}, waiting = {};
+    const add = u => { if (!by[u]) { by[u] = []; order.push(u); } };
+    list.forEach(x => { const u = x.unit || ""; add(u); by[u].push(x); });
+    plan.filter(i => i.unit && i.subject === state.subject && !i.setId).forEach(i => { add(i.unit); (waiting[i.unit] = waiting[i.unit] || []).push(i); });
+    const dueOf = u => {
+      const ids = (by[u] || []).map(x => x.id);
+      const hit = plan.filter(i => (i.setId && ids.includes(i.setId)) || i.unit === u).map(i => i.date).sort();
+      return hit[0] || "";
+    };
+    order.sort((p, q) => (p === "") - (q === "") || ((dueOf(p) || "9") > (dueOf(q) || "9") ? 1 : -1));
     const multi = order.length > 1 || order[0] !== "";
-    return order.map(u => `
-      ${multi ? `<h2 class="unit-head">${u ? "📘 " + esc(u) : "Other"}</h2>` : ""}
-      <div class="grid">${by[u].map(setCard).join("")}</div>`).join("");
+    return order.map(u => {
+      const d = dueOf(u);
+      const sorted = by[u].slice().sort((p, q) => (TYPE_ORDER[p.type] ?? 9) - (TYPE_ORDER[q.type] ?? 9));
+      const wait = (waiting[u] || []).map(i => `<div class="card set-card wait-card"><div><span class="tag">${esc(i.kind === "quiz" ? "Spelling" : "Waiting")}</span></div>
+        <h3 style="margin-top:10px">${esc(i.title)}</h3><div class="sub" style="margin:0">${esc(i.needs || "waiting on material")}</div></div>`).join("");
+      return `
+      ${multi ? `<h2 class="unit-head">${u ? "📘 " + esc(u) : "Other"}${d ? ` <small class="unit-due">quiz ${esc(nice(d))}</small>` : ""}</h2>` : ""}
+      <div class="grid">${sorted.map(setCard).join("")}${wait}</div>`;
+    }).join("");
   }
 
   function setCard(x) {
