@@ -197,12 +197,12 @@ STUDY.content.cole.science = [
 STUDY.content.cole.science.push({
   id: "light-words", type: "vocab", unit: "Light words", title: "Light words",
   words: [
-    { word: "luminous", pos: "adjective", def: "Giving off light; shining.", sentence: "The luminous jellyfish glowed in the dark water." },
-    { word: "photosynthesis", pos: "noun", def: "How plants use light, water, and carbon dioxide to make their own food and oxygen.", sentence: "Leaves use sunlight for photosynthesis." },
-    { word: "luminary", pos: "noun", def: "A person who is admired as a shining star in their field. Also, something that gives off light.", sentence: "The famous scientist was a luminary in her field." },
-    { word: "photon", pos: "noun", def: "A tiny particle of light.", sentence: "A single photon is far too small to see." },
-    { word: "illuminate", pos: "verb", def: "To light something up. Also, to make something clear.", sentence: "A flashlight can illuminate a dark room." },
-    { word: "elucidate", pos: "verb", def: "To make something clear by explaining it.", sentence: "Please elucidate how plants make food." },
-    { word: "lucid", pos: "adjective", def: "Clear and easy to understand.", sentence: "Her lucid explanation made the idea simple." }
+    { word: "luminous", pos: "adjective", def: "Filled with light. (Root lumin = light.)", sentence: "The moon looks luminous, but it only reflects the sun's light." },
+    { word: "luminary", pos: "noun", def: "A very inspiring or influential person. Also, an object that gives off light. (Root lumin = light.)", sentence: "The famous scientist was a luminary in her field." },
+    { word: "illuminate", pos: "verb", def: "To light up. (Root lumin = light.)", sentence: "A floodlight can illuminate the driveway at night." },
+    { word: "lucid", pos: "adjective", def: "Clear, or able to be understood. (Root luc = light.)", sentence: "The doctor wrote a lucid article about washing hands." },
+    { word: "elucidate", pos: "verb", def: "To make clear. (Root luc = light.)", sentence: "Please elucidate how plants make food." },
+    { word: "photon", pos: "noun", def: "A particle that carries electromagnetic energy, such as light. (Root phot = light.)", sentence: "X-rays and gamma rays are made of photons." },
+    { word: "photosynthesis", pos: "noun", def: "The process plants use to make food from light. (phot = light + synthesis = to put together.)", sentence: "Plants need sunlight for photosynthesis." }
   ]
 });
