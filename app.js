@@ -575,7 +575,6 @@
           ${canSpeak ? `<button class="btn primary" id="hear">🔊 Hear it</button><button class="btn" id="hearS">Hear it in a sentence</button>`
                      : `<span class="sub" style="margin:0">No sound on this device. It means: ${esc(w.def)}</span>`}
         </div>
-        <div class="blanks" aria-hidden="true">${blanksFor(w.word)}</div>
         <div style="margin:14px 0 4px"><input id="spIn" class="sp-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word"></div>
         <div id="spErr" class="sp-err"></div><div id="speakNote" class="sp-err"></div>
         <div class="row" style="justify-content:center"><button class="btn primary" id="spCheck">Check</button></div>
