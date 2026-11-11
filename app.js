@@ -14,34 +14,31 @@
 
   // read words aloud with the device's built-in voice (slow and clear for young speakers)
   const canSpeak = typeof window !== "undefined" && "speechSynthesis" in window && typeof SpeechSynthesisUtterance !== "undefined";
+  let liveUtterance = null; // keep a reference: iOS can silently drop speech if the utterance is garbage-collected
   function speak(text) {
     if (!canSpeak || !text) return;
     const note = msg => { const el = document.getElementById("speakNote"); if (el) el.textContent = msg; };
     try {
       const ss = speechSynthesis;
-      // cancel only when something is playing (cancel-then-speak silently fails on iPad)
-      if (ss.speaking || ss.pending) ss.cancel();
+      // only cancel our own speech that is still playing; cancel-then-speak right away silently fails on iPad
+      if (liveUtterance && (ss.speaking || ss.pending)) { ss.cancel(); }
       if (ss.paused) ss.resume();
       const u = new SpeechSynthesisUtterance(text);
+      liveUtterance = u;
       u.lang = "en-US"; u.rate = 0.5;
       const vs = ss.getVoices();
       // Samantha is the clearest voice on iPad/iPhone; fall back to any US English voice
       const v = vs.find(v => /^samantha/i.test(v.name)) || vs.find(v => /^en[-_]US/i.test(v.lang));
       if (v) u.voice = v;
       u.onstart = () => note("");
-      u.onerror = e => { if (e.error !== "canceled" && e.error !== "interrupted") note("Sound didn't play (" + (e.error || "unknown") + "). Check the volume and that the ringer switch is not on silent."); };
+      u.onend = () => { if (liveUtterance === u) liveUtterance = null; };
+      u.onerror = e => { if (liveUtterance === u) liveUtterance = null; if (e.error !== "canceled" && e.error !== "interrupted") note("Sound didn't play (" + (e.error || "unknown") + "). Check the volume and that the ringer switch is not on silent."); };
       ss.speak(u);
+      // if nothing starts within a moment, say so instead of staying silent
+      setTimeout(() => { if (liveUtterance === u && !ss.speaking && !ss.pending) note("Sound didn't start. Tap Hear it again, and check the volume and ringer switch."); }, 1500);
     } catch (e) { note("Sound isn't available on this device."); }
   }
-  // iPad/iPhone only allow speech after a tap: unlock it on the first touch with a silent word
-  if (canSpeak) {
-    const unlock = () => {
-      try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
-      document.removeEventListener("pointerdown", unlock, true);
-    };
-    document.addEventListener("pointerdown", unlock, true);
-    try { speechSynthesis.getVoices(); } catch (e) {}
-  }
+  if (canSpeak) { try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch (e) {} }
 
   const S = STUDY;
   const state = {
