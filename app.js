@@ -296,6 +296,11 @@
       const hit = plan.filter(i => (i.setId && ids.includes(i.setId)) || i.unit === u).map(i => i.date).sort();
       return hit[0] || "";
     };
+    const kindOf = u => {
+      const ids = (by[u] || []).map(x => x.id), d = dueOf(u);
+      const it = plan.find(i => i.date === d && ((i.setId && ids.includes(i.setId)) || i.unit === u));
+      return it ? (it.kind === "test" ? "test" : it.kind === "verse" ? "due" : "quiz") : "due";
+    };
     order.sort((p, q) => (p === "") - (q === "") || ((dueOf(p) || "9") > (dueOf(q) || "9") ? 1 : -1));
     const multi = order.length > 1 || order[0] !== "";
     return order.map(u => {
@@ -304,7 +309,7 @@
       const wait = (waiting[u] || []).map(i => `<div class="card set-card wait-card"><div><span class="tag">${esc(i.kind === "quiz" ? "Spelling" : "Waiting")}</span></div>
         <h3 style="margin-top:10px">${esc(i.title)}</h3><div class="sub" style="margin:0">${esc(i.needs || "waiting on material")}</div></div>`).join("");
       return `
-      ${multi ? `<h2 class="unit-head">${u ? "📘 " + esc(u) : "Other"}${d ? ` <small class="unit-due">quiz ${esc(nice(d))}</small>` : ""}</h2>` : ""}
+      ${multi ? `<h2 class="unit-head">${u ? "📘 " + esc(u) : "Other"}${d ? ` <small class="unit-due">${kindOf(u)} ${esc(nice(d))}</small>` : ""}</h2>` : ""}
       <div class="grid">${sorted.map(setCard).join("")}${wait}</div>`;
     }).join("");
   }
