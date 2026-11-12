@@ -4,7 +4,6 @@ window.STUDY = window.STUDY || { content: {} };
 STUDY.needs = {
   updated: "2026-11-11",
   cole: [
-    { subject: "english", due: "2026-11-11", what: "Lesson 4 spelling word list", why: "Lesson 4 spelling and vocab quiz" },
     { subject: "latin", what: "Chapter 3 vocabulary (numbers) and the next chapter's word list", why: "Next chapter quiz (not on the calendar yet)" },
     { subject: "math", what: "Study guide or textbook section for the next unit", why: "Next quiz (last ones were decimals and division)" },
     { subject: "civics", what: "Study guide for the next unit", why: "Next test (geography test was Oct 27)" },
