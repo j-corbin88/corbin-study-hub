@@ -206,3 +206,17 @@ STUDY.content.cole.english.push({
     { word: "photosynthesis", pos: "noun", def: "The process plants use to make food from light. (phot = light + synthesis = to put together.)", sentence: "Plants need sunlight for photosynthesis." }
   ]
 });
+// English: Lesson 4 spelling quiz (same words as the Light words vocab set).
+STUDY.content.cole.english.push({
+  id: "light-words-spelling", type: "spelling", unit: "Unit 4", title: "Lesson 4 spelling (Light words)",
+  words: [
+    { word: "luminous", pos: "adjective", def: "Filled with light. (Root lumin = light.)", sentence: "The moon looks luminous, but it only reflects the sun's light." },
+    { word: "luminary", pos: "noun", def: "A very inspiring or influential person. Also, an object that gives off light. (Root lumin = light.)", sentence: "The famous scientist was a luminary in her field." },
+    { word: "illuminate", pos: "verb", def: "To light up. (Root lumin = light.)", sentence: "A floodlight can illuminate the driveway at night." },
+    { word: "lucid", pos: "adjective", def: "Clear, or able to be understood. (Root luc = light.)", sentence: "The doctor wrote a lucid article about washing hands." },
+    { word: "elucidate", pos: "verb", def: "To make clear. (Root luc = light.)", sentence: "Please elucidate how plants make food." },
+    { word: "photon", pos: "noun", def: "A particle that carries electromagnetic energy, such as light. (Root phot = light.)", sentence: "X-rays and gamma rays are made of photons." },
+    { word: "photosynthesis", pos: "noun", def: "The process plants use to make food from light. (phot = light + synthesis = to put together.)", sentence: "Plants need sunlight for photosynthesis." }
+  ]
+});
+
