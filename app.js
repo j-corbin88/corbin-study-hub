@@ -193,7 +193,7 @@
     const today = isoD(now);
     const base = dow === 0 ? addD(now, 1) : dow === 6 ? addD(now, 2) : addD(now, 1 - dow);
     const start = addD(base, which * 7), fri = addD(start, 4);
-    const { sessions, load } = planSessions(plan, dow === 0 || dow === 6 ? isoD(base) : today);
+    const { sessions, load } = planSessions(plan, dow === 0 || dow === 6 ? isoD(base) : isoD(addD(now, 1 - dow)));
     const cardH = (cls, title, sub, open) => {
       const body = `<b>${esc(title)}</b><small>${sub}</small>`;
       return open ? `<button class="it ${cls}" data-open="${esc(JSON.stringify(open))}">${body}</button>` : `<div class="it ${cls}">${body}</div>`;
@@ -204,7 +204,7 @@
       const due = plan.due.filter(x => x.date === k).map(x =>
         cardH(x.setId ? "ok" : "need", x.title, esc(x.subj) + " &middot; " + esc(x.setId ? (x.ready || "ready") : (x.needs || "")), openOf(x.setId, x.subject))).join("");
       const ses = (sessions[k] || []).map(s =>
-        cardH((s.setId ? "ok" : "need") + " dash", s.label, `${s.min} min &middot; ${esc(s.sub || "")}`, openOf(s.setId, s.subject))).join("");
+        cardH((s.setId ? "ok" : "need") + " dash" + (k < today ? " past" : ""), s.label, `${s.min} min &middot; ${esc(s.sub || "")}`, openOf(s.setId, s.subject))).join("");
       const tot = load[k] || 0;
       return `<div class="wday${k === today ? " today" : ""}"><p class="wdh">${DOW[d.getDay()]}<span>${short(d)}${k === today ? " &middot; today" : ""} &middot; ${esc(e.label || "")}</span></p>
         <div class="wblk"><p class="wsec">Due</p>${due || '<p class="wnone">Nothing due</p>'}</div>
@@ -485,7 +485,7 @@
   }
   // run an already-built list of questions (used by the practice test and story order)
   function runQs(x, qs, opts) {
-    qz = { set: x, qs, i: 0, score: 0, missed: [], missedQs: [], answered: false, record: !!opts.record, regen: opts.regen, skipped: new Set() };
+    qz = { set: x, qs, i: 0, score: 0, missed: [], missedQs: [], answered: false, record: !!opts.record, regen: opts.regen, skipped: new Set(), picks: new Map() };
     drawQ();
   }
   function drawQ() {
@@ -494,7 +494,8 @@
     const q = qz.qs[qz.i];
     qz.answered = false;
     // a question can be skipped once; it moves to the end and has to be answered then
-    const canSkip = !qz.skipped.has(q) && qz.i < qz.qs.length - 1;
+    const picked = qz.picks.has(q);
+    const canSkip = !picked && !qz.skipped.has(q) && qz.i < qz.qs.length - 1;
     p.innerHTML = `
       <div class="sub" style="margin-bottom:0">Question ${qz.i + 1} of ${qz.qs.length} &middot; ${qz.score} correct</div>
       <div class="progress"><i style="width:${(qz.i / qz.qs.length) * 100}%"></i></div>
@@ -503,25 +504,34 @@
         <div class="q-prompt">${esc(q.prompt)}</div>
         <div class="opts">${q.opts.map((o, n) => `<button class="opt" data-n="${n}"><span class="k">${LETTERS[n]}</span><span>${esc(o)}</span></button>`).join("")}</div>
         <div id="fb"></div>
-        ${canSkip ? `<div style="margin-top:12px"><button class="btn" id="skipQ">Skip for now &rarr;</button></div>` : ""}
+        <div class="row" style="margin-top:12px">${qz.i > 0 ? `<button class="btn" id="backQ">&larr; Back</button>` : ""}${canSkip ? `<button class="btn" id="skipQ">Skip for now &rarr;</button>` : ""}</div>
       </div>`;
+    const backQ = $("#backQ"); if (backQ) backQ.onclick = () => { qz.i--; drawQ(); };
     p.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.n));
     const skipQ = $("#skipQ");
     if (skipQ) skipQ.onclick = () => { qz.skipped.add(q); qz.qs.push(qz.qs.splice(qz.i, 1)[0]); drawQ(); };
+    if (picked) showFeedback(q, qz.picks.get(q));
   }
   function answer(n) {
     if (qz.answered) return;
+    const q = qz.qs[qz.i];
+    if (qz.picks.has(q)) return;
+    qz.picks.set(q, n);
+    const ok = q.opts[n] === q.correct;
+    if (ok) qz.score++; else { qz.missed.push(q.w); qz.missedQs.push(q); }
+    if (q.kind === "word-to-def" || q.kind === "def-to-word" || q.kind === "blank") recordMiss(q.w, q.w._set || qz.set.id, ok);
+    showFeedback(q, n);
+  }
+  // shows the result for a question (also used when going back to one already answered)
+  function showFeedback(q, n) {
     qz.answered = true;
     const sk = $("#skipQ"); if (sk) sk.remove();
-    const q = qz.qs[qz.i];
     const ok = q.opts[n] === q.correct;
     document.querySelectorAll(".opt").forEach((b, i) => {
       b.disabled = true;
       if (q.opts[i] === q.correct) b.classList.add("correct");
       else if (i === n) b.classList.add("wrong");
     });
-    if (ok) qz.score++; else { qz.missed.push(q.w); qz.missedQs.push(q); }
-    if (q.kind === "word-to-def" || q.kind === "def-to-word" || q.kind === "blank") recordMiss(q.w, q.w._set || qz.set.id, ok);
     const last = qz.i === qz.qs.length - 1;
     $("#fb").innerHTML = `<div class="feedback ${ok ? "good" : "bad"}">${ok ? "Correct!" : "Not quite."}
       <small><b>${esc(q.w.word)}</b>: ${esc(q.w.def)}</small>${q.note ? `<small class="note">${esc(q.note)}</small>` : ""}</div>
@@ -566,12 +576,29 @@
   let sp = null;
   function startSpelling(x, words) {
     const base = words || x.words;
-    sp = { set: x, qs: shuffle(base), i: 0, score: 0, missed: [], full: !words, skipped: new Set() };
+    sp = { set: x, qs: shuffle(base), i: 0, score: 0, missed: [], full: !words, skipped: new Set(), res: new Map() };
     drawSpell();
   }
   function drawSpell() {
     if (sp.i >= sp.qs.length) return endSpell();
     const w = sp.qs[sp.i];
+    const back = sp.i > 0 ? `<button class="btn" id="spBack">&larr; Back</button>` : "";
+    if (sp.res.has(w)) {
+      // already answered: show the result, with Back and Next
+      const r = sp.res.get(w);
+      $("#panel").innerHTML = `
+      <div class="sub" style="margin-bottom:0">Word ${sp.i + 1} of ${sp.qs.length} &middot; ${sp.score} right</div>
+      <div class="progress"><i style="width:${(sp.i / sp.qs.length) * 100}%"></i></div>
+      <div class="card" style="text-align:center">
+        ${w.pic ? `<div class="sp-pic" aria-hidden="true">${w.pic}</div>` : ""}
+        <div class="feedback ${r.ok ? "good" : "bad"}" style="margin-top:14px"><div class="sp-word">${hiWord(w)}</div>
+          ${r.ok ? "Nice spelling!" : `You typed &ldquo;${esc(r.typed)}&rdquo;.`}<small>${esc(w.sentence)}</small></div>
+        <div class="row" style="justify-content:center;margin-top:14px">${back}<button class="btn primary" id="spNext2">${sp.i === sp.qs.length - 1 ? "See results" : "Next"} &rarr;</button></div>
+      </div>`;
+      const b0 = $("#spBack"); if (b0) b0.onclick = () => { sp.i--; drawSpell(); };
+      $("#spNext2").onclick = () => { sp.i++; drawSpell(); };
+      return;
+    }
     $("#panel").innerHTML = `
       <div class="sub" style="margin-bottom:0">Word ${sp.i + 1} of ${sp.qs.length} &middot; ${sp.score} right</div>
       <div class="progress"><i style="width:${(sp.i / sp.qs.length) * 100}%"></i></div>
@@ -583,11 +610,12 @@
         </div>
         <div style="margin:14px 0 4px"><input id="spIn" class="sp-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word"></div>
         <div id="spErr" class="sp-err"></div><div id="speakNote" class="sp-err"></div>
-        <div class="row" style="justify-content:center"><button class="btn primary" id="spCheck">Check</button>${sp.skipped.has(w) || sp.i >= sp.qs.length - 1 ? "" : `<button class="btn" id="spSkipFirst">Skip for now</button>`}</div>
+        <div class="row" style="justify-content:center">${back}<button class="btn primary" id="spCheck">Check</button>${sp.skipped.has(w) || sp.i >= sp.qs.length - 1 ? "" : `<button class="btn" id="spSkipFirst">Skip for now</button>`}</div>
         <div id="spFb"></div>
       </div>`;
     const input = $("#spIn");
     input.focus();
+    const backBtn = $("#spBack"); if (backBtn) backBtn.onclick = () => { sp.i--; drawSpell(); };
     const skipFirst = $("#spSkipFirst");
     if (skipFirst) skipFirst.onclick = () => { sp.skipped.add(w); sp.qs.push(sp.qs.splice(sp.i, 1)[0]); drawSpell(); };
     const hear = $("#hear"); if (hear) hear.onclick = () => speak(w.word);
@@ -600,6 +628,7 @@
       $("#spCheck").remove(); if ($("#spSkipFirst")) $("#spSkipFirst").remove();
       const ok = normWord(typed) === normWord(w.word);
       if (ok) sp.score++; else sp.missed.push(w);
+      sp.res.set(w, { typed, ok });
       recordMiss(w, sp.set.id, ok);
       spellFeedback(w, ok, typed);
     };

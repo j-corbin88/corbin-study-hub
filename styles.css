@@ -202,3 +202,5 @@ button.vw.hid{font:inherit;border:0;border-bottom:2px solid #adb5bd;background:#
 .pq:last-child{border-bottom:0}
 .pq-t{margin-bottom:8px;line-height:1.45}
 .pq-r{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px;color:var(--muted)}
+
+.it.past{opacity:.6}
