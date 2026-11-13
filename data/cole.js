@@ -193,6 +193,73 @@ STUDY.content.cole.science = [
     ] }
 ];
 
+// Wink practice test and story order. Written from online chapter summaries (not the book text), so check against his copy of the book.
+STUDY.content.cole.english.push({
+  id: "wink-ch-9-18-practice", unit: "Wink", title: "Wink - Chapters 9-18 practice test", type: "test", generated: true,
+  questions: [
+    { n: 1, ch: 9, q: "On his first day wearing the cowboy hat to school, how does Ross get there?", opts: ["He takes the school bus", "He avoids the bus", "Linda drives him all the way into the building", "He rides his bike"], ans: 1, cole: null,
+      why: "Ross avoids the bus so fewer kids stare at him." },
+    { n: 2, ch: 9, q: "Why does Ross keep his eye mostly shut and use fake tears?", opts: ["His surgeon removed his lacrimal gland", "He lost his eye in an accident", "He is allergic to the hat", "He is practicing winking"], ans: 0, cole: null,
+      why: "The surgery removed the lacrimal gland, the gland that makes tears, so the eye is dry and opening it stings." },
+    { n: 3, ch: 9, q: "Who gives Ross a CD of his band's music, and what is the band called?", opts: ["Jimmy; Batpig", "Frank; Ripe Sponge", "Callie; The Zappers", "Abby; Ripe Sponge"], ans: 1, cole: null,
+      why: "Frank from the treatment center gives Ross a CD by his band, Ripe Sponge." },
+    { n: 4, ch: 10, q: "What day is it on Ross's second day with the hat?", opts: ["His birthday", "Halloween", "The first day of winter break", "The day of the talent show"], ans: 1, cole: null,
+      why: "It's Halloween. Ross notices kids whispering and staring." },
+    { n: 5, ch: 10, q: "When classmates stare, what does Abby think is the reason?", opts: ["The hat", "A rumor about Jimmy", "A school announcement", "Ross's guitar"], ans: 0, cole: null,
+      why: "Abby has no idea about the memes yet, so she assumes they are looking at the hat." },
+    { n: 6, ch: 11, q: "What does Abby tell Ross before trick-or-treating?", opts: ["She is moving away", "Three hurtful memes about him are online", "She is quitting band", "Isaac wants to be friends again"], ans: 1, cole: null,
+      why: "Abby tells him about three mean memes about him that are going around online. Her moving away comes later, in Chapter 13." },
+    { n: 7, ch: 11, q: "What does Ross do about the memes?", opts: ["Reports them to the principal", "Posts a reply", "Refuses to report them and runs home crying", "Calls Frank"], ans: 2, cole: null,
+      why: "Hurt and scared, Ross refuses to report them and runs home." },
+    { n: 8, ch: 12, q: "In the flashback, what does Dr. Throckton tell Ross about his eye?", opts: ["It must be removed", "It can be treated without removing it", "It will heal on its own", "He will go blind in both eyes"], ans: 1, cole: null,
+      why: "Dr. Throckton, a proton radiation specialist, says the tumor can be treated without taking out the eye, so Ross keeps the structure of his right eye and the sight in his left." },
+    { n: 9, ch: 12, q: "What plan does Ross agree to?", opts: ["Radiation only", "Surgery, then radiation", "Medicine only", "Wait and see"], ans: 1, cole: null,
+      why: "Ross accepts surgery followed by proton radiation treatments." },
+    { n: 10, ch: 13, q: "What does Ross ask Frank to teach him?", opts: ["Drums", "Guitar", "Piano", "Drawing"], ans: 1, cole: null,
+      why: "Ross asks Frank to teach him guitar, even though Frank has never taught anyone." },
+    { n: 11, ch: 13, q: "What is Abby's big news?", opts: ["She won the talent show", "Her family is moving to Saint Paul, Minnesota", "She got a new viola", "She is switching schools to be with Isaac"], ans: 1, cole: null,
+      why: "Her dad is taking a job with his brother in Saint Paul, Minnesota, and the family will move after the semester." },
+    { n: 12, ch: 14, q: "What does Frank say that shocks Ross before he says he's kidding?", opts: ["Offers him a beer", "Tells him to quit guitar", "Asks him to join the band", "Says Ross is too young to play"], ans: 0, cole: null,
+      why: "Frank offers Ross a beer, then laughs at his shocked face and says he is joking." },
+    { n: 13, ch: 16, q: "What does Frank tell Ross to do that he takes to heart?", opts: ["Practice only on weekends", "Play until his fingers bleed", "Skip lessons when tired", "Learn to read music first"], ans: 1, cole: null,
+      why: "Ross takes Frank's order to keep playing until his fingers bleed seriously and practices over and over." },
+    { n: 14, ch: 16, q: "Abby keeps pushing Ross to enter what?", opts: ["The art contest", "The talent show", "The school newspaper", "The science fair"], ans: 1, cole: null,
+      why: "Abby keeps urging him to enter the talent show until he plays a couple of chords for her." },
+    { n: 15, ch: 17, q: "What sets off Ross's breakdown in Chapter 17?", opts: ["A comic book with the word \"dead\" on it", "A text from Isaac", "A phone call from Dr. Throckton", "A fight with Linda"], ans: 0, cole: null,
+      why: "A Walking Dead comic makes him realize he could die. He cries on his bedroom floor." },
+    { n: 16, ch: 17, q: "How does Linda comfort Ross?", opts: ["She calls his dad", "She rests her cheek on his head and tells him to distract himself from bad thoughts", "She takes him out for ice cream", "She tells him not to worry about anything"], ans: 1, cole: null,
+      why: "She comforts him quietly, which reminds him of his mother, and says to steer his mind to other things when scary thoughts come." },
+    { n: 17, ch: 18, q: "Who does Ross suspect made the memes?", opts: ["Isaac", "Sarah", "Jimmy", "Chris"], ans: 2, cole: null,
+      why: "Ross looks at every student with a phone, but Jimmy seems the most likely." },
+    { n: 18, ch: 18, q: "What happens in class when Jimmy makes fun of Ross for playing guitar?", opts: ["Ross walks out", "Ross throws his textbook at Jimmy and a fight breaks out", "The teacher sends Jimmy to the office", "Abby stands up for him"], ans: 1, cole: null,
+      why: "Ross throws his textbook at Jimmy, and then he breaks down in front of everyone, including Sarah." }
+  ],
+  terms: [
+    { word: "Ross Maloy", pos: "main character", def: "The seventh grader who tells the story. He has a rare eye cancer, draws comics, and learns guitar." },
+    { word: "Abby", pos: "character", def: "Ross's best friend since first grade. She plays viola, urges Ross to enter the talent show, and her family is moving to Saint Paul, Minnesota." },
+    { word: "Frank", pos: "character", def: "A radiation tech at Ross's treatment center. He gives Ross a Ripe Sponge CD and teaches him guitar." },
+    { word: "Linda", pos: "character", def: "Ross's stepmother. She comforts him after his breakdown in Chapter 17." },
+    { word: "Jimmy", pos: "character", def: "A classmate who mocks Ross. Ross suspects him of making the memes, and they fight in Chapter 18." },
+    { word: "Dr. Throckton", pos: "character", def: "The proton radiation doctor who tells Ross his eye can be saved." },
+    { word: "Batpig", pos: "character", def: "The superhero pig in Ross's comics. Batpig shows how Ross feels." },
+    { word: "Ripe Sponge", pos: "band", def: "Frank's band. Ross listens to their CD for comfort." },
+    { word: "Lacrimal gland", pos: "body part", def: "The gland that makes tears. Ross's surgeon removed it, so he needs fake tears." },
+    { word: "Memes", pos: "noun", def: "Three mean images about Ross that spread online around Halloween." }
+  ],
+  events: [
+    "Ross wears the cowboy hat to school for the first time and Frank gives him a Ripe Sponge CD",
+    "On Halloween, kids whisper and stare at Ross, and Abby thinks it's the hat",
+    "Abby tells Ross about three mean memes, and he runs home crying",
+    "Flashback: Dr. Throckton says Ross can keep his eye with surgery and radiation",
+    "The next morning, Ross asks Frank to teach him guitar",
+    "Abby tells Ross her family is moving to Saint Paul, Minnesota",
+    "Frank starts teaching Ross and jokes about offering him a beer",
+    "Ross practices until his fingers are sore, and Abby pushes him to enter the talent show",
+    "A Walking Dead comic makes Ross realize he could die, and Linda comforts him",
+    "Back at school, Ross throws his textbook at Jimmy and a fight breaks out"
+  ]
+});
+
 // English: light words (Growing Your Vocabulary, Chapter 4: Light and its Travels).
 STUDY.content.cole.english.push({
   id: "light-words", type: "vocab", unit: "Unit 4", title: "Light words (Chapter 4)",

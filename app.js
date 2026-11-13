@@ -315,7 +315,7 @@
     const best = store.get(bestKey(x.id));
     const isTest = x.type === "test";
     return `<button class="card set-card" data-set="${x.id}">
-      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? "Chapter review" : x.type === "spelling" ? "Spelling" : x.type === "verse" ? "Memory verse" : x.type === "prompts" ? "Study questions" : "Vocabulary"}</span></div>
+      <div>${x.sample ? '<span class="tag sample">SAMPLE</span>' : ""}<span class="tag">${isTest ? (x.generated ? "Practice test" : "Chapter review") : x.type === "spelling" ? "Spelling" : x.type === "verse" ? "Memory verse" : x.type === "prompts" ? "Study questions" : "Vocabulary"}</span></div>
       <h3 style="margin-top:10px">${esc(x.title)}</h3>
       <div class="sub" style="margin:0">${x.type === "prompts" ? x.groups.reduce((n, g) => n + g.qs.length, 0) + " questions" : x.type === "verse" ? esc(x.ref) + (x.due ? " &middot; due " + esc(nice(x.due)) : "") : isTest ? x.questions.length + " questions" : x.words.length + " words"}${best ? ` &middot; best ${esc(best)}` : ""}</div>
     </button>`;
@@ -324,7 +324,7 @@
   function viewSet() {
     const x = curSet();
     if (!x) return viewHome();
-    const tabs = TABS[x.type] || TABS.vocab;
+    const tabs = (TABS[x.type] || TABS.vocab).filter(t => !(t[0] === "order" && !x.events));
     if (!tabs.some(t => t[0] === state.mode)) state.mode = tabs[0][0];
     const tab = ([id, label]) => `<button class="tab" role="tab" data-mode="${id}" aria-selected="${state.mode === id}">${label}</button>`;
     $("#main").innerHTML = `
@@ -480,12 +480,12 @@
   function startQuiz(x, words) {
     const w = words || x.words;
     if (w.length < 2) { $("#panel").innerHTML = `<div class="card">Need at least 2 words for a quiz.</div>`; return; }
-    qz = { set: x, qs: buildQuestions(w), i: 0, score: 0, missed: [], missedQs: [], answered: false, record: true, regen: null };
+    qz = { set: x, qs: buildQuestions(w), i: 0, score: 0, missed: [], missedQs: [], answered: false, record: true, regen: null, skipped: new Set() };
     drawQ();
   }
   // run an already-built list of questions (used by the practice test and story order)
   function runQs(x, qs, opts) {
-    qz = { set: x, qs, i: 0, score: 0, missed: [], missedQs: [], answered: false, record: !!opts.record, regen: opts.regen };
+    qz = { set: x, qs, i: 0, score: 0, missed: [], missedQs: [], answered: false, record: !!opts.record, regen: opts.regen, skipped: new Set() };
     drawQ();
   }
   function drawQ() {
@@ -493,6 +493,8 @@
     if (qz.i >= qz.qs.length) return endQuiz();
     const q = qz.qs[qz.i];
     qz.answered = false;
+    // a question can be skipped once; it moves to the end and has to be answered then
+    const canSkip = !qz.skipped.has(q) && qz.i < qz.qs.length - 1;
     p.innerHTML = `
       <div class="sub" style="margin-bottom:0">Question ${qz.i + 1} of ${qz.qs.length} &middot; ${qz.score} correct</div>
       <div class="progress"><i style="width:${(qz.i / qz.qs.length) * 100}%"></i></div>
@@ -501,12 +503,16 @@
         <div class="q-prompt">${esc(q.prompt)}</div>
         <div class="opts">${q.opts.map((o, n) => `<button class="opt" data-n="${n}"><span class="k">${LETTERS[n]}</span><span>${esc(o)}</span></button>`).join("")}</div>
         <div id="fb"></div>
+        ${canSkip ? `<div style="margin-top:12px"><button class="btn" id="skipQ">Skip for now &rarr;</button></div>` : ""}
       </div>`;
     p.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.n));
+    const skipQ = $("#skipQ");
+    if (skipQ) skipQ.onclick = () => { qz.skipped.add(q); qz.qs.push(qz.qs.splice(qz.i, 1)[0]); drawQ(); };
   }
   function answer(n) {
     if (qz.answered) return;
     qz.answered = true;
+    const sk = $("#skipQ"); if (sk) sk.remove();
     const q = qz.qs[qz.i];
     const ok = q.opts[n] === q.correct;
     document.querySelectorAll(".opt").forEach((b, i) => {
@@ -560,7 +566,7 @@
   let sp = null;
   function startSpelling(x, words) {
     const base = words || x.words;
-    sp = { set: x, qs: shuffle(base), i: 0, score: 0, missed: [], full: !words };
+    sp = { set: x, qs: shuffle(base), i: 0, score: 0, missed: [], full: !words, skipped: new Set() };
     drawSpell();
   }
   function drawSpell() {
@@ -577,11 +583,13 @@
         </div>
         <div style="margin:14px 0 4px"><input id="spIn" class="sp-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word"></div>
         <div id="spErr" class="sp-err"></div><div id="speakNote" class="sp-err"></div>
-        <div class="row" style="justify-content:center"><button class="btn primary" id="spCheck">Check</button></div>
+        <div class="row" style="justify-content:center"><button class="btn primary" id="spCheck">Check</button>${sp.skipped.has(w) || sp.i >= sp.qs.length - 1 ? "" : `<button class="btn" id="spSkipFirst">Skip for now</button>`}</div>
         <div id="spFb"></div>
       </div>`;
     const input = $("#spIn");
     input.focus();
+    const skipFirst = $("#spSkipFirst");
+    if (skipFirst) skipFirst.onclick = () => { sp.skipped.add(w); sp.qs.push(sp.qs.splice(sp.i, 1)[0]); drawSpell(); };
     const hear = $("#hear"); if (hear) hear.onclick = () => speak(w.word);
     const hearS = $("#hearS"); if (hearS) hearS.onclick = () => speak(w.sentence);
     const check = () => {
@@ -589,7 +597,7 @@
       $("#spErr").textContent = "";
       const typed = input.value;
       input.disabled = true;
-      $("#spCheck").remove();
+      $("#spCheck").remove(); if ($("#spSkipFirst")) $("#spSkipFirst").remove();
       const ok = normWord(typed) === normWord(w.word);
       if (ok) sp.score++; else sp.missed.push(w);
       recordMiss(w, sp.set.id, ok);
@@ -768,18 +776,19 @@
   function viewTestHome(x) {
     const missed = x.questions.filter(isMissed);
     const chapters = [...new Set(x.questions.map(q => q.ch))].sort((a, b) => a - b);
+    const chName = c => (x.topics && x.topics[c]) || "Chapter " + c;
     const best = store.get(bestKey(x.id));
     $("#panel").innerHTML = `
       <div class="card">
         <h2>${x.questions.length} questions</h2>
-        <p class="sub">Same questions and answer letters as the study guide.${best ? ` Best score so far: ${esc(best)}.` : ""}</p>
+        <p class="sub">${x.intro || (x.generated ? "Practice questions written from chapter summaries." : "Same questions and answer letters as the study guide.")}${best ? ` Best score so far: ${esc(best)}.` : ""}</p>
         <div class="row">
           <button class="btn primary" data-t="all">Start in order</button>
           <button class="btn" data-t="shuffle">Shuffle the questions</button>
           ${missed.length ? `<button class="btn" data-t="missed">Review the ${missed.length} I missed</button>` : ""}
         </div>
-        <p class="sub" style="margin:18px 0 8px">Or practice one chapter at a time:</p>
-        <div class="row">${chapters.map(c => `<button class="btn" data-t="ch${c}">Chapter ${c} (${x.questions.filter(q => q.ch === c).length})</button>`).join("")}</div>
+        <p class="sub" style="margin:18px 0 8px">${x.topics ? "Or practice one topic at a time:" : "Or practice one chapter at a time:"}</p>
+        <div class="row">${chapters.map(c => `<button class="btn" data-t="ch${c}">${esc(chName(c))} (${x.questions.filter(q => q.ch === c).length})</button>`).join("")}</div>
       </div>`;
     $("#panel").querySelectorAll("[data-t]").forEach(b => b.onclick = () => startTest(x, b.dataset.t));
   }
@@ -790,7 +799,7 @@
     else if (which.startsWith("ch")) qs = qs.filter(q => "ch" + q.ch === which);
     const built = qs.map(q => ({
       w: { word: "Question " + q.n, def: q.why }, kind: "test",
-      label: `Chapter ${q.ch} · Question ${q.n}`, prompt: q.q,
+      label: `${(x.topics && x.topics[q.ch]) || "Chapter " + q.ch} · Question ${q.n}`, prompt: q.q,
       correct: q.opts[q.ans], opts: q.opts.slice(), note: q.note || ""
     }));
     runQs(x, built, { record: which === "all" || which === "shuffle", regen: () => startTest(x, which) });
@@ -827,14 +836,14 @@
       const extra = q.written != null ? `<tr class="sub-row"><td></td><td colspan="4">Cole wrote: &ldquo;${esc(q.written)}&rdquo; &middot; ${esc(q.better)}</td></tr>` : "";
       return `<tr><td>${q.n}</td><td>${esc(q.q)}</td>
         <td><b>${LETTERS[q.ans]}.</b> ${esc(q.opts[q.ans])}</td>
-        <td>${q.cole == null ? "" : `<b>${LETTERS[q.cole]}.</b> ${esc(q.opts[q.cole])}`}</td>
-        <td class="${ok ? "ok" : "no"}">${q.cole == null ? "" : ok ? "✓" : "✗"}</td></tr>${extra}`;
+${hasCole ? `<td>${q.cole == null ? "" : `<b>${LETTERS[q.cole]}.</b> ${esc(q.opts[q.cole])}`}</td>
+        <td class="${ok ? "ok" : "no"}">${q.cole == null ? "" : ok ? "✓" : "✗"}</td>` : ""}</tr>${extra}`;
     };
     const e = x.extra;
     $("#panel").innerHTML = `
       <div class="row no-print" style="margin-bottom:14px"><button class="btn" id="printBtn">Print guide</button>
       ${hasCole ? `<span class="sub" style="margin:0">Cole's circled answers: ${right} of ${x.questions.length} match.</span>` : ""}</div>
-      <table class="words guide"><thead><tr><th>#</th><th>Question</th><th>Correct answer</th><th>Cole circled</th><th></th></tr></thead><tbody>
+      <table class="words guide"><thead><tr><th>#</th><th>Question</th><th>Correct answer</th>${hasCole ? "<th>Cole circled</th><th></th>" : ""}</tr></thead><tbody>
       ${x.questions.map(row).join("")}
       ${e ? `<tr><td>EC</td><td>${esc(e.q)}</td><td colspan="3">${esc(e.better)}<br><span class="sub" style="margin:0;font-size:13px">Cole wrote: &ldquo;${esc(e.cole)}&rdquo;</span></td></tr>` : ""}
       </tbody></table>`;
