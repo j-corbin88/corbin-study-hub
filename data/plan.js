@@ -5,7 +5,7 @@
 window.STUDY = window.STUDY || { content: {} };
 STUDY.plan = {
   cole: {
-    updated: "2026-11-12",
+    updated: "2026-11-13",
     // evening capacity in minutes by weekday number (0 = Sun). free: true marks evenings used for head starts.
     evenings: {
       1: { label: "Soccer night", cap: 40 },
@@ -34,6 +34,10 @@ STUDY.plan = {
       { date: "2026-11-12", subject: "science", subj: "Science", kind: "quiz", title: "Bacteria Cell quiz", ready: "9 cards and a quiz ready", setId: "bacteria-cell", studyLabel: "Bacteria cell", practice: "flashcards and quiz" },
       { date: "2026-11-13", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 9-18 quiz", ready: "Chapter questions and vocab ready", setId: "wink-ch-10-18-questions", studyLabel: "Wink Ch. 9-18", practice: "chapter questions" },
       { date: "2026-11-13", subject: "latin", subj: "Latin", kind: "task", title: "Ch 3: Numeri (Part 2)" },
+      { date: "2026-11-16", subject: "civics", subj: "Civics", kind: "task", title: "What is Civics? reading comprehension" },
+      { date: "2026-11-16", subject: "english", subj: "English", kind: "task", title: "\"Thank You, Ma'am\" comprehension check-in" },
+      { date: "2026-11-16", subject: "math", subj: "Math", kind: "task", title: "Study for decimal test (review and check answers)" },
+      { date: "2026-11-16", subject: "math", subj: "Math", kind: "test", title: "Decimals test", needs: "needs study guide", send: "Decimals review worksheet or textbook section", studyLabel: "Decimals", studyNeeds: "needs study guide" },
       { date: "2026-11-23", subject: "theology", subj: "Theology", kind: "verse", title: "Memory Verse #4", ready: "Matthew 5:14-16", setId: "verse-4-matt-5-14-16", studyLabel: "Memory Verse #4", practice: "Matthew 5:14-16" }
     ],
     coming: [
