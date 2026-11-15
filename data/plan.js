@@ -5,7 +5,7 @@
 window.STUDY = window.STUDY || { content: {} };
 STUDY.plan = {
   cole: {
-    updated: "2026-11-13",
+    updated: "2026-11-14",
     // evening capacity in minutes by weekday number (0 = Sun). free: true marks evenings used for head starts.
     evenings: {
       1: { label: "Soccer night", cap: 40 },
@@ -22,6 +22,7 @@ STUDY.plan = {
       { date: "2026-11-09", subject: "science", subj: "Science", kind: "task", title: "Lab Safety #2", needs: "needs notes", send: "Lab safety notes" },
       { date: "2026-11-10", subject: "english", subj: "English", kind: "task", title: "Nouns 3.1 HW" },
       { date: "2026-11-10", subject: "civics", subj: "Civics", kind: "task", title: "Textbook scavenger hunt" },
+      { date: "2026-11-10", subject: "english", subj: "English", kind: "task", title: "Lesson 4 vocabulary CW" },
       { date: "2026-11-10", subject: "latin", subj: "Latin", kind: "task", title: "Ch 3: Emotion Words, Part 1" },
       { date: "2026-11-11", subject: "latin", subj: "Latin", kind: "task", title: "Ch 3: Emotion Words, Part 2" },
       { date: "2026-11-11", subject: "math", subj: "Math", kind: "task", title: "Review worksheet: multiplying decimals and whole numbers (and correct homework)" },
@@ -34,16 +35,19 @@ STUDY.plan = {
       { date: "2026-11-12", subject: "science", subj: "Science", kind: "quiz", title: "Bacteria Cell quiz", ready: "9 cards and a quiz ready", setId: "bacteria-cell", studyLabel: "Bacteria cell", practice: "flashcards and quiz" },
       { date: "2026-11-13", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 9-18 quiz", ready: "Chapter questions and vocab ready", setId: "wink-ch-10-18-questions", studyLabel: "Wink Ch. 9-18", practice: "chapter questions" },
       { date: "2026-11-13", subject: "latin", subj: "Latin", kind: "task", title: "Ch 3: Numeri (Part 2)" },
+      { date: "2026-11-13", subject: "theology", subj: "Theology", kind: "task", title: "Wanted poster for Ignatius" },
       { date: "2026-11-16", subject: "civics", subj: "Civics", kind: "task", title: "What is Civics? reading comprehension" },
       { date: "2026-11-16", subject: "english", subj: "English", kind: "task", title: "\"Thank You, Ma'am\" comprehension check-in" },
       { date: "2026-11-16", subject: "math", subj: "Math", kind: "task", title: "Study for decimal test (review and check answers)" },
       { date: "2026-11-16", subject: "math", subj: "Math", kind: "test", title: "Decimals test", needs: "needs study guide", send: "Decimals review worksheet or textbook section", studyLabel: "Decimals", studyNeeds: "needs study guide" },
+      { date: "2026-11-17", subject: "theology", subj: "Theology", kind: "task", title: "Ignatius timeline / Grad at Grad" },
       { date: "2026-11-23", subject: "theology", subj: "Theology", kind: "verse", title: "Memory Verse #4", ready: "Matthew 5:14-16", setId: "verse-4-matt-5-14-16", studyLabel: "Memory Verse #4", practice: "Matthew 5:14-16" }
     ],
     coming: [
       { date: "2026-11-21", text: "Robotics: Capital Beltway Challenge" },
       { date: "2026-11-23", text: "Memory Verse #4 due" },
-      { date: "2026-11-25", text: "No classes (Thanksgiving break, Nov 25-27 and Nov 30)" }
+      { date: "2026-11-25", text: "No classes (Thanksgiving break, Nov 25-27 and Nov 30)" },
+      { date: "2026-12-05", text: "Robotics: Hereford Zone Stampede" }
     ]
   }
 };
