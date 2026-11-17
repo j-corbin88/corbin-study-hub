@@ -2,7 +2,7 @@
 // Each item: subject (id), what (what to send), due (YYYY-MM-DD, optional), why (the assignment it is for).
 window.STUDY = window.STUDY || { content: {} };
 STUDY.needs = {
-  updated: "2026-11-15",
+  updated: "2026-11-16",
   cole: [
     { subject: "latin", what: "Chapter 3 vocabulary (numbers) and the next chapter's word list", why: "Next chapter quiz (not on the calendar yet)" },
     { subject: "math", what: "Decimals review worksheet or textbook section", due: "2026-11-16", why: "Decimals test on Monday" },
