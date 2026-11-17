@@ -286,4 +286,35 @@ STUDY.content.cole.english.push({
     { word: "photosynthesis", pos: "noun", def: "The process plants use to make food from light. (phot = light + synthesis = to put together.)", sentence: "Plants need sunlight for photosynthesis." }
   ]
 });
+// English: Growing Your Vocabulary, Chapter 5: On the Move (Unit 5).
+STUDY.content.cole.english.push({
+  id: "move-words", type: "vocab", unit: "Unit 5", title: "On the Move (Chapter 5)",
+  words: [
+    { word: "projectile", pos: "noun", def: "An object that is thrown or propelled. (pro- = forward + ject = throw.)", sentence: "The cannon fired a projectile across the field." },
+    { word: "eject", pos: "verb", def: "To throw out. (e- = out + ject = throw.)", sentence: "The referee will eject any player who breaks the rules." },
+    { word: "interject", pos: "verb", def: "To cut in, or to break the flow. (inter- = between + ject = throw.)", sentence: "Nancy had to interject that the restaurant was closing." },
+    { word: "dejected", pos: "adjective", def: "Downcast or sad. (de- = down + ject = thrown.)", sentence: "Gayle looked dejected because she thought everyone forgot her birthday." },
+    { word: "mobile", pos: "adjective", def: "Able to move. (Root mob = moving.)", sentence: "A mobile library brings books to small towns." },
+    { word: "immobile", pos: "adjective", def: "Not able to move. (im- = not + mob = moving.)", sentence: "Plants are immobile because they cannot move from their location." },
+    { word: "remove", pos: "verb", def: "To change position, or to take away. (Root mov = to move.)", sentence: "Brady had to remove his mask so he wouldn't scare his little sister." },
+    { word: "remote", pos: "adjective", def: "Moved away from, or distant. (Root mot = to move.)", sentence: "The journalists set up a satellite connection at the remote campsite." },
+    { word: "motive", pos: "noun", def: "A person's reason for doing something; what moves someone to action. (Root mot = to move.)", sentence: "Ellen's motive for sticking to her diet is to lose five pounds." },
+    { word: "motivate", pos: "verb", def: "To urge into action. (Root mot = to move.)", sentence: "A good coach can motivate the team to practice hard." }
+  ]
+});
+STUDY.content.cole.english.push({
+  id: "move-words-spelling", type: "spelling", unit: "Unit 5", title: "Chapter 5 spelling (On the Move)",
+  words: [
+    { word: "projectile", pos: "noun", def: "An object that is thrown or propelled. (pro- = forward + ject = throw.)", sentence: "The cannon fired a projectile across the field." },
+    { word: "eject", pos: "verb", def: "To throw out. (e- = out + ject = throw.)", sentence: "The referee will eject any player who breaks the rules." },
+    { word: "interject", pos: "verb", def: "To cut in, or to break the flow. (inter- = between + ject = throw.)", sentence: "Nancy had to interject that the restaurant was closing." },
+    { word: "dejected", pos: "adjective", def: "Downcast or sad. (de- = down + ject = thrown.)", sentence: "Gayle looked dejected because she thought everyone forgot her birthday." },
+    { word: "mobile", pos: "adjective", def: "Able to move. (Root mob = moving.)", sentence: "A mobile library brings books to small towns." },
+    { word: "immobile", pos: "adjective", def: "Not able to move. (im- = not + mob = moving.)", sentence: "Plants are immobile because they cannot move from their location." },
+    { word: "remove", pos: "verb", def: "To change position, or to take away. (Root mov = to move.)", sentence: "Brady had to remove his mask so he wouldn't scare his little sister." },
+    { word: "remote", pos: "adjective", def: "Moved away from, or distant. (Root mot = to move.)", sentence: "The journalists set up a satellite connection at the remote campsite." },
+    { word: "motive", pos: "noun", def: "A person's reason for doing something; what moves someone to action. (Root mot = to move.)", sentence: "Ellen's motive for sticking to her diet is to lose five pounds." },
+    { word: "motivate", pos: "verb", def: "To urge into action. (Root mot = to move.)", sentence: "A good coach can motivate the team to practice hard." }
+  ]
+});
 
