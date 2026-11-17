@@ -41,6 +41,8 @@ STUDY.plan = {
       { date: "2026-11-16", subject: "math", subj: "Math", kind: "task", title: "Study for decimal test (review and check answers)" },
       { date: "2026-11-16", subject: "math", subj: "Math", kind: "test", title: "Decimals test", needs: "needs study guide", send: "Decimals review worksheet or textbook section", studyLabel: "Decimals", studyNeeds: "needs study guide" },
       { date: "2026-11-17", subject: "theology", subj: "Theology", kind: "task", title: "Ignatius timeline / Grad at Grad" },
+      { date: "2026-11-23", subject: "english", subj: "English", kind: "quiz", title: "Lesson 5 spelling quiz", unit: "Unit 5", ready: "On the Move, 10 words ready", setId: "move-words-spelling", studyLabel: "On the Move", studyKey: "move-words", practice: "spelling quiz" },
+      { date: "2026-11-23", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 5 quiz", unit: "Unit 5", ready: "On the Move (ch. 5), 10 words ready", setId: "move-words", studyLabel: "On the Move", studyKey: "move-words", practice: "flashcards and quiz" },
       { date: "2026-11-23", subject: "theology", subj: "Theology", kind: "verse", title: "Memory Verse #4", ready: "Matthew 5:14-16", setId: "verse-4-matt-5-14-16", studyLabel: "Memory Verse #4", practice: "Matthew 5:14-16" }
     ],
     coming: [
