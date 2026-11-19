@@ -5,7 +5,7 @@
 window.STUDY = window.STUDY || { content: {} };
 STUDY.plan = {
   cole: {
-    updated: "2026-11-17",
+    updated: "2026-11-18",
     // evening capacity in minutes by weekday number (0 = Sun). free: true marks evenings used for head starts.
     evenings: {
       1: { label: "Soccer night", cap: 40 },
@@ -26,11 +26,16 @@ STUDY.plan = {
       { date: "2026-11-17", subject: "science", subj: "Science", kind: "task", title: "Why the flu makes you feel so miserable" },
       { date: "2026-11-17", subject: "theology", subj: "Theology", kind: "task", title: "Ignatius timeline / Grad at Grad" },
       { date: "2026-11-18", subject: "civics", subj: "Civics", kind: "task", title: "American symbol research assignment" },
+      { date: "2026-11-18", subject: "english", subj: "English", kind: "task", title: "Lesson 5 vocabulary worksheet" },
+      { date: "2026-11-18", subject: "math", subj: "Math", kind: "task", title: "Value of a ratio (worksheet 3.1, #1-8)" },
+      { date: "2026-11-18", subject: "art", subj: "Art", kind: "task", title: "One-point perspective practice" },
+      { date: "2026-11-19", subject: "latin", subj: "Latin", kind: "task", title: "Ch. 3 gods and goddesses, picture description" },
+      { date: "2026-11-19", subject: "english", subj: "English", kind: "quiz", title: "Nouns usage quiz", needs: "needs notes", send: "Nouns usage notes (subject, subject complement, direct and indirect object)", studyLabel: "Nouns usage", studyNeeds: "needs notes" },
       { date: "2026-11-20", subject: "math", subj: "Math", kind: "quiz", title: "Ratios quiz", needs: "needs study guide", send: "Ratios notes or worksheet", studyLabel: "Ratios", studyNeeds: "needs notes" },
-      { date: "2026-11-23", subject: "english", subj: "English", kind: "quiz", title: "Lesson 5 spelling quiz", unit: "Unit 5", ready: "On the Move, 10 words ready", setId: "move-words-spelling", studyLabel: "On the Move", studyKey: "move-words", practice: "spelling quiz" },
-      { date: "2026-11-23", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 5 quiz", unit: "Unit 5", ready: "On the Move (ch. 5), 10 words ready", setId: "move-words", studyLabel: "On the Move", studyKey: "move-words", practice: "flashcards and quiz" },
+      { date: "2026-11-20", subject: "english", subj: "English", kind: "quiz", title: "Lesson 5 spelling quiz", unit: "Unit 5", ready: "On the Move, 10 words ready", setId: "move-words-spelling", studyLabel: "On the Move", studyKey: "move-words", practice: "spelling quiz" },
+      { date: "2026-11-20", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 5 quiz", unit: "Unit 5", ready: "On the Move (ch. 5), 10 words ready", setId: "move-words", studyLabel: "On the Move", studyKey: "move-words", practice: "flashcards and quiz" },
       { date: "2026-11-23", subject: "theology", subj: "Theology", kind: "verse", title: "Memory Verse #4", ready: "Matthew 5:14-16", setId: "verse-4-matt-5-14-16", studyLabel: "Memory Verse #4", practice: "Matthew 5:14-16" },
-      { date: "2026-11-24", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 19-29 quiz", needs: "needs chapter questions", send: "Wink chapters 19-29 questions or notes", studyLabel: "Wink Ch. 19-29", studyNeeds: "needs notes" }
+      { date: "2026-11-23", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 19-29 quiz", needs: "needs chapter questions", send: "Wink chapters 19-29 questions or notes", studyLabel: "Wink Ch. 19-29", studyNeeds: "needs notes" }
     ],
     coming: [
       { date: "2026-11-21", text: "Robotics: Capital Beltway Challenge" },
