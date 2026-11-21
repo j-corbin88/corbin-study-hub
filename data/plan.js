@@ -5,7 +5,7 @@
 window.STUDY = window.STUDY || { content: {} };
 STUDY.plan = {
   cole: {
-    updated: "2026-11-19",
+    updated: "2026-11-20",
     // evening capacity in minutes by weekday number (0 = Sun). free: true marks evenings used for head starts.
     evenings: {
       1: { label: "Soccer night", cap: 40 },
@@ -30,11 +30,15 @@ STUDY.plan = {
       { date: "2026-11-18", subject: "math", subj: "Math", kind: "task", title: "Value of a ratio (worksheet 3.1, #1-8)" },
       { date: "2026-11-18", subject: "art", subj: "Art", kind: "task", title: "One-point perspective practice" },
       { date: "2026-11-20", subject: "latin", subj: "Latin", kind: "task", title: "Ch. 3 gods and goddesses, picture description" },
+      { date: "2026-11-19", subject: "civics", subj: "Civics", kind: "task", title: "Ch. 1 section 1.1 guided reading (pp. 6-8)" },
       { date: "2026-11-19", subject: "english", subj: "English", kind: "quiz", title: "Nouns usage quiz", needs: "needs notes", send: "Nouns usage notes (subject, subject complement, direct and indirect object)", studyLabel: "Nouns usage", studyNeeds: "needs notes" },
+      { date: "2026-11-20", subject: "civics", subj: "Civics", kind: "task", title: "Finish 1.1 guided reading (pp. 8-10, worksheet #9-12)" },
+      { date: "2026-11-20", subject: "science", subj: "Science", kind: "task", title: "Killer Microbes (see OneNote)" },
       { date: "2026-11-20", subject: "math", subj: "Math", kind: "task", title: "Ratios and the value of a ratio worksheet" },
       { date: "2026-11-20", subject: "math", subj: "Math", kind: "quiz", title: "Ratios quiz", needs: "needs study guide", send: "Ratios notes or worksheet", studyLabel: "Ratios", studyNeeds: "needs notes" },
       { date: "2026-11-20", subject: "english", subj: "English", kind: "quiz", title: "Lesson 5 spelling quiz", unit: "Unit 5", ready: "On the Move, 10 words ready", setId: "move-words-spelling", studyLabel: "On the Move", studyKey: "move-words", practice: "spelling quiz" },
       { date: "2026-11-20", subject: "english", subj: "English", kind: "quiz", title: "Vocab Unit 5 quiz", unit: "Unit 5", ready: "On the Move (ch. 5), 10 words ready", setId: "move-words", studyLabel: "On the Move", studyKey: "move-words", practice: "flashcards and quiz" },
+      { date: "2026-11-23", subject: "pe", subj: "PE", kind: "quiz", title: "Flag football written assessment", needs: "needs rules notes", send: "Flag football rules or notes", studyLabel: "Flag football", studyNeeds: "needs notes" },
       { date: "2026-11-23", subject: "theology", subj: "Theology", kind: "verse", title: "Memory Verse #4", ready: "Matthew 5:14-16", setId: "verse-4-matt-5-14-16", studyLabel: "Memory Verse #4", practice: "Matthew 5:14-16" },
       { date: "2026-11-23", subject: "english", subj: "English", kind: "quiz", title: "Wink Ch. 19-29 quiz", needs: "needs chapter questions", send: "Wink chapters 19-29 questions or notes", studyLabel: "Wink Ch. 19-29", studyNeeds: "needs notes" },
       { date: "2026-11-24", subject: "math", subj: "Math", kind: "quiz", title: "Math quiz: solving ratio problems (tape diagram or table)", needs: "needs study guide", send: "Ratio problem notes (tape diagrams and tables)", studyLabel: "Ratio problems", studyNeeds: "needs notes" }
