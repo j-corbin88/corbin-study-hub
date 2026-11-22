@@ -56,7 +56,8 @@
   const fixSubject = () => { if (!allowedSubjects().some(s => s.id === state.subject)) state.subject = allowedSubjects()[0].id; };
   fixSubject();
   const subject = () => S.subjects.find(s => s.id === state.subject);
-  const sets = () => ((S.content[state.profile] || {})[state.subject]) || [];
+  // A set with hidden: true is on the site but not shown to the kid until the flag is removed.
+  const sets = () => (((S.content[state.profile] || {})[state.subject]) || []).filter(x => !x.hidden);
   const curSet = () => state.setId === REVIEW_ID ? reviewSet() : sets().find(x => x.id === state.setId);
   const bestKey = id => `sh:best:${state.profile}:${id}`;
 
@@ -240,7 +241,7 @@
       const subs = p.subjects ? S.subjects.filter(s => p.subjects.includes(s.id)) : S.subjects;
       const content = S.content[p.id] || {};
       const rows = subs.map(s => {
-        const n = (content[s.id] || []).length;
+        const n = (content[s.id] || []).filter(x => !x.hidden).length;
         return `<tr><td>${s.icon} ${esc(s.name)}</td><td>${n ? `<span class="ok">${n} set${n > 1 ? "s" : ""}</span>` : `<span class="wait">Placeholder</span>`}</td></tr>`;
       }).join("");
       const needs = (N[p.id] || []).slice().sort((a, b) => (a.due || "9999") < (b.due || "9999") ? -1 : 1);

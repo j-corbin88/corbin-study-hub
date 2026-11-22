@@ -318,3 +318,76 @@ STUDY.content.cole.english.push({
   ]
 });
 
+
+// Wink chapters 19-31 vocabulary (from the class handout). Quiz Mon Nov 23 (6-7) / Tue Nov 24 (6-2, 6-3, 6-6).
+STUDY.content.cole.english.unshift({
+  id: "wink-ch-19-31-vocab", unit: "Wink", title: "Wink - Chapters 19-31 vocabulary", type: "vocab",
+  words: [
+    { word: "censor", pos: "verb", def: "to examine something and remove parts that are thought to be offensive or not allowed", sentence: "The school will censor any messages that contain rude words." },
+    { word: "memorabilia", pos: "noun", def: "objects kept or collected because they are connected to a person, event, or hobby", sentence: "His room was full of baseball memorabilia, including signed balls." },
+    { word: "exasperated", pos: "adjective", def: "very annoyed or frustrated", sentence: "The exasperated teacher asked the class to be quiet for the third time." },
+    { word: "flabbergasted", pos: "adjective", def: "completely shocked and amazed", sentence: "She was flabbergasted when she won the contest." },
+    { word: "skulls", pos: "noun", def: "the bones of the head that protect the brain", sentence: "The museum had a display of dinosaur skulls." },
+    { word: "suave", pos: "adjective", def: "charming, smooth, and polite in a confident way", sentence: "The suave host greeted every guest with a smile." },
+    { word: "lumbar", pos: "adjective", def: "having to do with the lower part of the back", sentence: "The doctor put a needle in his lumbar spine to test it." },
+    { word: "abnormal", pos: "adjective", def: "not normal or typical; different from what is expected", sentence: "The doctor found an abnormal result on the test." },
+    { word: "impending", pos: "adjective", def: "about to happen soon", sentence: "Dark clouds warned of the impending storm." },
+    { word: "epiphany", pos: "noun", def: "a sudden moment of understanding or realization", sentence: "He had an epiphany and finally understood the math problem." },
+    { word: "slog", pos: "noun / verb", def: "a long, tiring, difficult task or effort; to work or walk with great effort", sentence: "The hike up the muddy hill was a long slog." },
+    { word: "cherish", pos: "verb", def: "to treasure and care for something deeply", sentence: "I cherish the photo of my grandparents." },
+    { word: "gurney", pos: "noun", def: "a wheeled stretcher used to move patients in a hospital", sentence: "The nurses rolled the gurney down the hall." },
+    { word: "permanent", pos: "adjective", def: "lasting forever or for a very long time; not temporary", sentence: "Permanent marker does not wash off easily." },
+    { word: "amplifier", pos: "noun", def: "a device that makes sound louder", sentence: "He turned up the amplifier so the guitar was louder." },
+    { word: "cymbal", pos: "noun", def: "a thin round metal plate that is struck to make a crashing sound", sentence: "The drummer hit the cymbal with a loud crash." },
+    { word: "anesthesia", pos: "noun", def: "medicine that keeps a patient from feeling pain or being awake during surgery", sentence: "The patient was under anesthesia during the operation." },
+    { word: "anesthesiologist", pos: "noun", def: "a doctor who gives anesthesia and watches the patient during surgery", sentence: "The anesthesiologist checked his heartbeat throughout the surgery." },
+    { word: "bygones", pos: "noun", def: "past arguments or problems that are forgiven and forgotten (as in 'let bygones be bygones')", sentence: "They shook hands and agreed to let bygones be bygones." },
+    { word: "inwardly", pos: "adverb", def: "in your own mind or feelings, without showing it on the outside", sentence: "He smiled, but inwardly he was very nervous." },
+    { word: "gesture", pos: "noun / verb", def: "a movement of the body or hands that shows a feeling or idea; an act that shows kindness", sentence: "She made a kind gesture by holding the door open." },
+    { word: "morphs", pos: "verb", def: "changes smoothly from one form into another", sentence: "In the video, the caterpillar morphs into a butterfly." },
+    { word: "hodgepodge", pos: "noun", def: "a messy mixture of different things", sentence: "The junk drawer was a hodgepodge of tape, batteries, and old keys." },
+    { word: "ignoramus", pos: "noun", def: "a person who is ignorant or doesn't know something they should", sentence: "He felt like an ignoramus when he couldn't answer the easy question." },
+    { word: "smirk", pos: "noun / verb", def: "a smug or sneaky smile; to smile in that way", sentence: "A smirk spread across his face when he saw the prank work." }
+  ]
+});
+
+// Wink chapters 19-31 comprehension questions (from the class handout). Quiz Mon Nov 23 / Tue Nov 24.
+// hidden: true keeps this off the kid's site until Jordan says to enable it (delete the hidden line).
+STUDY.content.cole.english.unshift({
+  id: "wink-ch-19-31-questions", type: "prompts", unit: "Wink", title: "Wink - Chapters 19-31 questions", hidden: true,
+  intro: "Think about each question, jot an answer, and tick it when you could answer it out loud.",
+  groups: [
+    { title: "Chapters 19-20", qs: [
+      { n: 1, q: "Do you think Jimmy made the memes? Why or why not?" },
+      { n: 2, q: "How does the principal punish Ross and Jimmy for the fight? Do you think this was an appropriate punishment?" },
+      { n: 3, q: "In your opinion do you think cell phones being allowed at school has also contributed to Ross being bullied? Should cell phones be allowed at school?" },
+      { n: 4, q: "How do you think this new side effect of the radiation will affect Ross's social life?" }
+    ] },
+    { title: "Chapters 21-23", qs: [
+      { n: 5, q: "Why is the name of this chapter, “The Clump?”" },
+      { n: 6, q: "How do you think Ross feels after the situation in the cafeteria? How would you feel?" },
+      { n: 7, q: "Ross talks a lot about wanting to be normal. Why do you think this might be so important to him? What is good about being ‘different’?" },
+      { n: 8, q: "Abby and Ross are hanging out in the basement and there is tension. Do you think Abby was right to react how she did, or not?" }
+    ] },
+    { title: "Chapters 24 and 25", qs: [
+      { n: 9, q: "Ross unloads a lot of problems on Frank at the guitar lesson. Describe how Ross is feeling." },
+      { n: 10, q: "Ross states “Well, being special sucks.” Discuss this statement." },
+      { n: 11, q: "How do you feel after you vent to a close friend or family member when you have a lot on your mind? Do you find it helps?" },
+      { n: 12, q: "What happens between Jimmy and Ross in these chapters? What do you think will happen next? Predict." }
+    ] },
+    { title: "Chapters 26-28", qs: [
+      { n: 13, q: "How does the music practice session go? Describe at least three important aspects of it." },
+      { n: 14, q: "Why is it significant that Jimmy referred to Ross as his bandmate?" },
+      { n: 15, q: "What did Jimmy think was going on between Ross and Abby?" },
+      { n: 16, q: "What is Jimmy's opinion of Sarah Kennedy?" },
+      { n: 17, q: "Summarize the days after Ross's surgery. Use at least 4-8 things you read in your summary." }
+    ] },
+    { title: "Chapters 29-31", qs: [
+      { n: 18, q: "What instrument does Ross ask Abby to play?" },
+      { n: 19, q: "Abby and Ross finally talk. Did their conversation go how you expected it to go?" },
+      { n: 20, q: "How does Abby react to Ross asking her to play in the talent show with them?" },
+      { n: 21, q: "Describe Ross and Sarah's conversation." },
+      { n: 22, q: "What does Frank take Ross to do?" }
+    ] }
+  ]
+});
