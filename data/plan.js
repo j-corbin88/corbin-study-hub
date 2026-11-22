@@ -5,7 +5,7 @@
 window.STUDY = window.STUDY || { content: {} };
 STUDY.plan = {
   cole: {
-    updated: "2026-11-20",
+    updated: "2026-11-21",
     // evening capacity in minutes by weekday number (0 = Sun). free: true marks evenings used for head starts.
     evenings: {
       1: { label: "Soccer night", cap: 40 },
@@ -47,7 +47,8 @@ STUDY.plan = {
       { date: "2026-11-21", text: "Robotics: Capital Beltway Challenge" },
       { date: "2026-11-23", text: "Memory Verse #4 due" },
       { date: "2026-11-25", text: "No classes (Thanksgiving break, Nov 25-27 and Nov 30)" },
-      { date: "2026-12-05", text: "Robotics: Hereford Zone Stampede" }
+      { date: "2026-12-05", text: "Robotics: Hereford Zone Stampede" },
+      { date: "2026-12-12", text: "Robotics: Knight's Melee MS Open Tournament" }
     ]
   }
 };
