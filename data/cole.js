@@ -352,9 +352,8 @@ STUDY.content.cole.english.unshift({
 });
 
 // Wink chapters 19-31 comprehension questions (from the class handout). Quiz Mon Nov 23 / Tue Nov 24.
-// hidden: true keeps this off the kid's site until Jordan says to enable it (delete the hidden line).
 STUDY.content.cole.english.unshift({
-  id: "wink-ch-19-31-questions", type: "prompts", unit: "Wink", title: "Wink - Chapters 19-31 questions", hidden: true,
+  id: "wink-ch-19-31-questions", type: "prompts", unit: "Wink", title: "Wink - Chapters 19-31 questions",
   intro: "Think about each question, jot an answer, and tick it when you could answer it out loud.",
   groups: [
     { title: "Chapters 19-20", qs: [
