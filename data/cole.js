@@ -141,7 +141,7 @@ STUDY.content.cole = {
 STUDY.content.cole.theology.push(
   { id: "verse-3-matt-6-33-34", type: "verse", unit: "Memory verses", title: "Memory Verse #3", ref: "Matthew 6:33-34", due: "2026-11-03",
     text: "But seek first his kingdom and his righteousness and all these things will be given to you as well. Therefore, do not worry about tomorrow, for tomorrow will worry about itself. Each day has enough trouble of its own." },
-  { id: "verse-4-matt-5-14-16", type: "verse", unit: "Memory verses", title: "Memory Verse #4", ref: "Matthew 5:14-16", due: "2026-11-23",
+  { id: "verse-4-matt-5-14-16", type: "verse", unit: "Memory verses", title: "Memory Verse #4", ref: "Matthew 5:14-16", due: "2026-11-24",
     text: "You are the light of the world. A city set on a hill cannot be hidden. Nor do people light a lamp and put it under a basket, but on a stand, and it gives light to all in the house. In the same way, let your light shine before others, so that they may see your good works and give glory to your Father who is in heaven." }
 );
 
